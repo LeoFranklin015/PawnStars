@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 import "./RWA.sol";
 import "./UniversalKYC.sol";
-contract IssuerContract {
+contract Issuer {
     address public owner;
     address public rwaContractAddress;
     uint256 public requestCounter;

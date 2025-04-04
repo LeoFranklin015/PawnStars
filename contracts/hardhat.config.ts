@@ -38,6 +38,11 @@ const config: HardhatUserConfig = {
       accounts: [process.env.PRIVATE_KEY || ""],
       // 0.5 gwei
     },
+    hashkeyTestnet: {
+      chainId: 133,
+      url: "https://hashkeychain-testnet.alt.technology",
+      accounts: [process.env.PRIVATE_KEY || ""],
+    },
   },
   etherscan: {
     apiKey: {

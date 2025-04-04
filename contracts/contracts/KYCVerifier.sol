@@ -10,7 +10,6 @@ import {IERC20, SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeE
 import {Formatter} from "@selfxyz/contracts/contracts/libraries/Formatter.sol";
 import {CircuitAttributeHandler} from "@selfxyz/contracts/contracts/libraries/CircuitAttributeHandler.sol";
 import {CircuitConstants} from "@selfxyz/contracts/contracts/constants/CircuitConstants.sol";
-
 contract SelfHappyBirthday is SelfVerificationRoot, Ownable {
 
 

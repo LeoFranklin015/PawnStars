@@ -3,5 +3,9 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "hardhat": "^2.22.19"
+  },
+  "dependencies": {
+    "@selfxyz/contracts": "^0.0.2",
+    "@selfxyz/core": "^0.0.23"
   }
 }

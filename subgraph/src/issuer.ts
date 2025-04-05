@@ -1,40 +1,63 @@
 import {
   RWAApproved as RWAApprovedEvent,
-  RWARequestCreated as RWARequestCreatedEvent
-} from "../generated/Issuer/Issuer"
-import { RWAApproved, RWARequestCreated } from "../generated/schema"
-
-export function handleRWAApproved(event: RWAApprovedEvent): void {
-  let entity = new RWAApproved(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.requestId = event.params.requestId
-  entity.requester = event.params.requester
-  entity.productName = event.params.productName
-  entity.productModel = event.params.productModel
-  entity.documentHash = event.params.documentHash
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
+  RWARequestCreated as RWARequestCreatedEvent,
+} from "../generated/Issuer/Issuer";
+import { User, RWA, RWARequest } from "../generated/schema";
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 export function handleRWARequestCreated(event: RWARequestCreatedEvent): void {
-  let entity = new RWARequestCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.requestId = event.params.requestId
-  entity.requester = event.params.requester
-  entity.yearsOfUsage = event.params.yearsOfUsage
-  entity.productName = event.params.productName
-  entity.productModel = event.params.productModel
-  entity.documentHash = event.params.documentHash
+  // Load or create User
+  let userId = event.params.requester;
+  let user = User.load(userId);
+  if (!user) {
+    user = new User(userId);
+    user.isVerified = false;
+    user.createdAt = event.block.timestamp;
+    user.lastUpdated = event.block.timestamp;
+    user.save();
+  }
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+  let requestId = event.params.requestId.toString();
 
-  entity.save()
+  // Create RWA entity in REQUESTED state
+  let rwa = new RWA(requestId);
+  rwa.owner = userId;
+  rwa.tokenURI = event.params.documentHash; // Initially use documentHash as tokenURI
+  rwa.status = "REQUESTED";
+  rwa.createdAt = event.block.timestamp;
+  rwa.lastUpdated = event.block.timestamp;
+  rwa.save();
+
+  // Create RWA Request
+  let request = new RWARequest(requestId);
+  request.requester = userId;
+  request.rwa = requestId;
+  request.productName = event.params.productName;
+  request.productModel = event.params.productModel;
+  request.yearsOfUsage = event.params.yearsOfUsage;
+  request.documentHash = event.params.documentHash;
+  request.status = "PENDING";
+  request.createdAt = event.block.timestamp;
+  request.lastUpdated = event.block.timestamp;
+  request.save();
+}
+
+export function handleRWAApproved(event: RWAApprovedEvent): void {
+  let requestId = event.params.requestId.toString();
+
+  // Update RWA Request status
+  let request = RWARequest.load(requestId);
+  if (!request) return;
+
+  request.status = "APPROVED";
+  request.lastUpdated = event.block.timestamp;
+  request.save();
+
+  // Update RWA status
+  let rwa = RWA.load(requestId);
+  if (!rwa) return;
+
+  rwa.status = "APPROVED";
+  rwa.lastUpdated = event.block.timestamp;
+  rwa.save();
 }

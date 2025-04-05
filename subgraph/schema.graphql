@@ -1,24 +1,120 @@
-type RWAApproved @entity(immutable: true) {
+# User related entities
+type User @entity {
+  id: Bytes! # address
+  isVerified: Boolean!
+  verificationTime: BigInt
+  name: String
+  proof: Bytes
+  rwas: [RWA!]! @derivedFrom(field: "owner")
+  loans: [Loan!]! @derivedFrom(field: "borrower")
+  createdAt: BigInt!
+  lastUpdated: BigInt!
+}
+
+# RWA related entities
+type RWA @entity {
+  id: String! # tokenId
+  owner: User!
+  tokenURI: String!
+  status: RWAStatus!
+  request: RWARequest
+  loans: [Loan!]! @derivedFrom(field: "rwa")
+  createdAt: BigInt!
+  lastUpdated: BigInt!
+}
+
+enum RWAStatus {
+  REQUESTED
+  APPROVED
+  ISSUED
+  IN_LOAN
+  AVAILABLE
+}
+
+type RWARequest @entity {
+  id: String! # requestId
+  requester: User!
+  rwa: RWA!
+  productName: String!
+  productModel: String!
+  yearsOfUsage: BigInt!
+  documentHash: String!
+  status: RWARequestStatus!
+  createdAt: BigInt!
+  lastUpdated: BigInt!
+}
+
+enum RWARequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+# Lending Protocol related entities
+type Loan @entity {
+  id: String! # loanId
+  borrower: User!
+  rwa: RWA!
+  requestedAmount: BigInt!
+  valuation: BigInt
+  amount: BigInt
+  interestRate: BigInt
+  startTime: BigInt
+  dueTime: BigInt
+  status: LoanStatus!
+  repaymentAmount: BigInt
+  repaymentTime: BigInt
+  createdAt: BigInt!
+  lastUpdated: BigInt!
+}
+
+enum LoanStatus {
+  REQUESTED # Initial request created
+  VALUED # Valuation provided
+  ACCEPTED # Borrower accepted terms
+  REJECTED # Request rejected
+  ACTIVE # Loan is active
+  REPAID # Loan has been repaid
+  DEFAULTED # Loan has defaulted
+}
+
+# Event tracking entities (immutable, for historical record)
+type UserVerifiedEvent @entity(immutable: true) {
   id: Bytes!
-  requestId: BigInt! # uint256
-  requester: Bytes! # address
-  productName: String! # string
-  productModel: String! # string
-  documentHash: String! # string
+  user: User!
+  proof: Bytes!
+  name: String!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type RWARequestCreated @entity(immutable: true) {
+type RWATokenIssuedEvent @entity(immutable: true) {
   id: Bytes!
-  requestId: BigInt! # uint256
-  requester: Bytes! # address
-  yearsOfUsage: BigInt! # uint256
-  productName: String! # string
-  productModel: String! # string
-  documentHash: String! # string
+  rwa: RWA!
+  owner: User!
+  tokenURI: String!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+}
+
+type LoanEvent @entity(immutable: true) {
+  id: Bytes!
+  loan: Loan!
+  eventType: LoanEventType!
+  # Fields for different event types
+  valuation: BigInt # For VALUATION_PROVIDED
+  repaymentAmount: BigInt # For REPAID
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+enum LoanEventType {
+  REQUESTED
+  VALUATION_PROVIDED
+  ACCEPTED
+  ISSUED
+  REPAID
 }

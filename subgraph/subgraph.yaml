@@ -27,3 +27,78 @@ dataSources:
         - event: RWARequestCreated(indexed uint256,indexed address,uint256,string,string,string)
           handler: handleRWARequestCreated
       file: ./src/issuer.ts
+
+  - kind: ethereum
+    name: UniversalKYC
+    network: hashkeychain-sepolia
+    source:
+      address: "0x13830FbC6270adefDeB1D5913bD782a0F86E4920" # Replace with actual address
+      abi: UniversalKYC
+      startBlock: 010323033
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - UserVerified
+      abis:
+        - name: UniversalKYC
+          file: ./abis/UniversalKYC.json
+      eventHandlers:
+        - event: USERVERIFIED(indexed address,bytes32,string)
+          handler: handleUserVerified
+      file: ./src/universal-kyc.ts
+
+  - kind: ethereum
+    name: RWA
+    network: hashkeychain-sepolia
+    source:
+      address: "0xD62378A75CfED3644D39Bce139A40d3B27027Fb1" # Replace with actual address
+      abi: RWA
+      startBlock: 010322733
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - RWATokenIssued
+      abis:
+        - name: RWA
+          file: ./abis/RWA.json
+      eventHandlers:
+        - event: RWATokenIssued(indexed uint256,indexed address,string)
+          handler: handleRWATokenIssued
+      file: ./src/rwa.ts
+
+  - kind: ethereum
+    name: LendingProtocol
+    network: hashkeychain-sepolia
+    source:
+      address: "0xb2960d2Bc3b789E0383656029a06ED6e775dFC7e" # Replace with actual address
+      abi: LendingProtocol
+      startBlock: 010323033
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - LoanRequested
+        - ValuationProvided
+        - LoanAccepted
+        - LoanIssued
+        - LoanRepaid
+      abis:
+        - name: LendingProtocol
+          file: ./abis/LendingProtocol.json
+      eventHandlers:
+        - event: LoanRequested(indexed address,indexed uint256,uint256,uint256,uint256)
+          handler: handleLoanRequested
+        - event: ValuationProvided(indexed uint256,indexed uint256,uint256)
+          handler: handleValuationProvided
+        - event: LoanAccepted(indexed uint256,indexed address,uint256,uint256,uint256)
+          handler: handleLoanAccepted
+        - event: LoanIssued(indexed uint256,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleLoanIssued
+        - event: LoanRepaid(indexed uint256,indexed address,uint256,uint256,uint256)
+          handler: handleLoanRepaid
+      file: ./src/lending-protocol.ts

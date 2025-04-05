@@ -117,7 +117,11 @@ export const CustomConnectButton = () => {
             {showProfileModal && connected && (
               <ProfileModal
                 onClose={() => setShowProfileModal(false)}
-                account={account}
+                account={{
+                  displayName: account.displayName,
+                  displayBalance: account.displayBalance,
+                  address: account.address,
+                }}
                 onDisconnect={openAccountModal}
               />
             )}

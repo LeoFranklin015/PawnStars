@@ -24,7 +24,7 @@ async function main() {
   const identityVerificationHub = "0x3e2487a250e2A7b56c7ef5307Fb591Cc8C83623D";
 
   const scope = hashEndpointWithScope(
-    "https://3129-111-235-226-130.ngrok-free.app",
+    "https://1d89-111-235-226-130.ngrok-free.app",
     "self-workshop"
   );
   const attestationId = 1n;

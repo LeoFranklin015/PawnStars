@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { proof, publicSignals } = body;
-    const ContractAddress = "0x02DD486b283a644D1C72f83Ef5B4e4fF97f6D6BE";
+    const ContractAddress = "0xB35867517ce0D65Db253B8b9878cAdE96903607F";
 
     if (!proof || !publicSignals) {
       return NextResponse.json(
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     // const configuredVerifier = new SelfBackendVerifier(
     //   "self-workshop",
-    //   "https://3129-111-235-226-130.ngrok-free.app/api/verify",
+    //   "https://1d89-111-235-226-130.ngrok-free.app/api/verify",
     //   "uuid",
     //   true
     // )

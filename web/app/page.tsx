@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useUserStore } from "@/lib/stores/user-store";
 import { CheckCircle2, FileCheck, Coins, ArrowRight } from "lucide-react";
 
 export default function Home() {

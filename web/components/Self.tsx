@@ -11,7 +11,7 @@ export default function Self() {
   const selfApp = new SelfAppBuilder({
     appName: "Self Workshop",
     scope: "self-workshop",
-    endpoint: `https://3129-111-235-226-130.ngrok-free.app/api/verify`,
+    endpoint: `https://1d89-111-235-226-130.ngrok-free.app/api/verify`,
     logoBase64:
       "https://pluspng.com/img-png/images-owls-png-hd-owl-free-download-png-png-image-485.png",
     userIdType: "hex",

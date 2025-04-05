@@ -11,76 +11,71 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { publicClient, walletClient } from "@/lib/client";
-import { ISSUER_ABI, ISSUER_CONTRACT_ADDRESS } from "@/lib/const";
+import {
+  ISSUER_ABI,
+  ISSUER_CONTRACT_ADDRESS,
+  LENDING_PROTOCOL_CONTRACT_ADDRESS,
+  LendingProtocolABI,
+} from "@/lib/const";
 import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import { toast } from "sonner";
+import { fetchInLoan } from "@/lib/helpers/fetchInLoan";
 
-interface LoanRequest {
+interface RWA {
   id: string;
-  borrower: string;
-  rwaId: string;
-  valuation: string;
-  status: string;
   productName: string;
+  imageHash: string;
+  yearsOfUsage: string;
+  status: string;
+  documentHash: string;
+  tokenURI: string;
+  createdAt: string;
+  lastUpdated: string;
+  owner: {
+    id: string;
+    name: string;
+  };
+  loans: {
+    id: string;
+    amount: string | null;
+    createdAt: string;
+    dueTime: string | null;
+    interestRate: string | null;
+    lastUpdated: string;
+    repaymentAmount: string | null;
+    repaymentTime: string | null;
+    requestedAmount: string;
+    startTime: string | null;
+    status: string;
+    valuation: string | null;
+  }[];
 }
 
 export default function AdminLoans() {
-  const [loanRequests, setLoanRequests] = useState<LoanRequest[]>([]);
+  const [loans, setLoans] = useState<RWA[]>([]);
   const [loading, setLoading] = useState(true);
   const { address } = useAccount();
 
   const fetchLoanRequests = async () => {
     try {
-      // TODO: Replace with actual GraphQL query
-      // This is a placeholder - you'll need to implement the actual query
-      const query = `
-        query GetLoanRequests {
-          loanRequests(where: { isActive: true, isAccepted: true, isFilled: false }) {
-            id
-            borrower
-            rwaId
-            valuation
-            status
-            rwa {
-              productName
-            }
-          }
-        }
-      `;
+      const rwas = await fetchInLoan();
 
-      // Placeholder data for now
-      const mockData = {
-        loanRequests: [
-          {
-            id: "1",
-            borrower: "0x1234...5678",
-            rwaId: "1",
-            valuation: ethers.parseEther("1.5").toString(),
-            status: "ACCEPTED",
-            rwa: {
-              productName: "Vintage Watch",
-            },
-          },
-          // Add more mock data as needed
-        ],
-      };
-
-      setLoanRequests(
-        mockData.loanRequests.map((request) => ({
-          ...request,
-          productName: request.rwa.productName,
-        }))
+      // Filter for only IN_LOAN assets
+      const activeLoanRWAs = rwas.filter(
+        (rwa: RWA) => rwa.status === "IN_LOAN"
       );
+
+      setLoans(activeLoanRWAs);
     } catch (error) {
-      console.error("Error fetching loan requests:", error);
-      toast.error("Failed to fetch loan requests");
+      console.error("Error fetching loans:", error);
+      toast.error("Failed to fetch loans");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleIssueLoan = async (requestId: string) => {
+  const handleIssueLoan = async (rwaId: number) => {
     if (!address) {
       toast.error("Please connect your wallet");
       return;
@@ -91,10 +86,10 @@ export default function AdminLoans() {
 
       const tx = await walletClient?.writeContract({
         account: address as `0x${string}`,
-        address: ISSUER_CONTRACT_ADDRESS,
-        abi: ISSUER_ABI,
+        address: LENDING_PROTOCOL_CONTRACT_ADDRESS,
+        abi: LendingProtocolABI,
         functionName: "issueLoan",
-        args: [BigInt(requestId)],
+        args: [BigInt(rwaId)],
       });
 
       await publicClient.waitForTransactionReceipt({
@@ -136,64 +131,84 @@ export default function AdminLoans() {
             className="text-4xl font-black"
             style={{ textShadow: "3px 3px 0px #FFD700" }}
           >
-            LOAN REQUESTS
+            ACTIVE LOANS
           </h1>
           <p className="mt-2 text-gray-600">
-            Manage and issue loans for accepted requests
+            Manage active loans in the system
           </p>
         </div>
 
         <div className="bg-white p-6 rounded-lg border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)]">
           {loading ? (
             <div className="text-center py-8">
-              <p>Loading loan requests...</p>
+              <p>Loading active loans...</p>
             </div>
-          ) : loanRequests.length === 0 ? (
+          ) : loans.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500">No pending loan requests found.</p>
+              <p className="text-gray-500">No active loans found.</p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Request ID</TableHead>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Borrower</TableHead>
                   <TableHead>RWA ID</TableHead>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Owner</TableHead>
+                  <TableHead>Loan Status</TableHead>
                   <TableHead>Valuation</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Created</TableHead>
                   <TableHead>Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loanRequests.map((request) => (
-                  <TableRow key={request.id}>
-                    <TableCell className="font-mono">{request.id}</TableCell>
-                    <TableCell>{request.productName}</TableCell>
-                    <TableCell className="font-mono">
-                      {request.borrower.slice(0, 6)}...
-                      {request.borrower.slice(-4)}
-                    </TableCell>
-                    <TableCell>{request.rwaId}</TableCell>
-                    <TableCell>
-                      {ethers.formatEther(request.valuation)} ETH
-                    </TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border-2 border-yellow-500">
-                        {request.status}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        onClick={() => handleIssueLoan(request.id)}
-                        className="border-2 border-black"
-                        size="sm"
-                      >
-                        Issue Loan
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {loans.map((rwa) => {
+                  const latestLoan = rwa.loans[0]; // Most recent loan
+                  return (
+                    <TableRow key={rwa.id}>
+                      <TableCell className="font-mono">{rwa.id}</TableCell>
+                      <TableCell>{rwa.productName}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-mono text-xs">
+                            {rwa.owner.id.slice(0, 6)}...
+                            {rwa.owner.id.slice(-4)}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {rwa.owner.name}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border-2 border-blue-500">
+                          {latestLoan.status}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        {latestLoan.valuation
+                          ? parseFloat(
+                              ethers.formatEther(latestLoan.valuation)
+                            ).toFixed(2)
+                          : "0"}{" "}
+                        USDC
+                      </TableCell>
+                      <TableCell>
+                        {new Date(
+                          parseInt(latestLoan.createdAt) * 1000
+                        ).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          onClick={() => handleIssueLoan(parseInt(rwa.id) - 1)}
+                          variant="outline"
+                          className="border-2 border-black"
+                          size="sm"
+                        >
+                          Verify and Collect
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           )}

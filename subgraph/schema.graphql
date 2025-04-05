@@ -1,0 +1,24 @@
+type RWAApproved @entity(immutable: true) {
+  id: Bytes!
+  requestId: BigInt! # uint256
+  requester: Bytes! # address
+  productName: String! # string
+  productModel: String! # string
+  documentHash: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RWARequestCreated @entity(immutable: true) {
+  id: Bytes!
+  requestId: BigInt! # uint256
+  requester: Bytes! # address
+  yearsOfUsage: BigInt! # uint256
+  productName: String! # string
+  productModel: String! # string
+  documentHash: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

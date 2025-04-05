@@ -107,60 +107,53 @@ export default function MyRWAs() {
   };
 
   const getRWAStatus = (rwa: RWA) => {
+    // First check the RWA status from the API
+    if (rwa.status) {
+      return rwa.status;
+    }
+
+    // Fallback to checking loan status
     if (rwa.loans && rwa.loans.length > 0) {
       const latestLoan = rwa.loans[0];
       if (latestLoan.status === "ACTIVE") {
-        return "lending";
+        return "IN_LOAN";
       }
     }
 
-    switch (rwa.contractStatus) {
-      case 0:
-        return "requested";
-      case 1:
-        return "valued";
-      case 2:
-        return "accepted";
-      case 3:
-        return "issued";
-      case 4:
-        return "repaid";
-      default:
-        return "unknown";
-    }
+    return "UNKNOWN";
   };
 
   const getStatusDisplay = (status: string) => {
     switch (status) {
-      case "lending":
+      case "REQUESTED":
         return {
-          text: "In Lending",
-          classes: "bg-blue-100 text-blue-800 border-2 border-blue-500",
-        };
-      case "requested":
-        return {
-          text: "Loan Requested",
+          text: "Requested",
           classes: "bg-yellow-100 text-yellow-800 border-2 border-yellow-500",
         };
-      case "valued":
+      case "APPROVED":
         return {
-          text: "Valuation Done",
-          classes: "bg-purple-100 text-purple-800 border-2 border-purple-500",
-        };
-      case "accepted":
-        return {
-          text: "Loan Accepted",
+          text: "Approved",
           classes: "bg-green-100 text-green-800 border-2 border-green-500",
         };
-      case "issued":
+      case "REQUESTED_LOAN":
         return {
-          text: "Loan Issued",
+          text: "Loan Requested",
           classes: "bg-blue-100 text-blue-800 border-2 border-blue-500",
         };
-      case "repaid":
+      case "REQUESTED_LOAN_VALIDATED":
         return {
-          text: "Loan Repaid",
-          classes: "bg-gray-100 text-gray-800 border-2 border-gray-500",
+          text: "Loan Offer Available",
+          classes: "bg-purple-100 text-purple-800 border-2 border-purple-500",
+        };
+      case "IN_LOAN":
+        return {
+          text: "In Loan",
+          classes: "bg-blue-100 text-blue-800 border-2 border-blue-500",
+        };
+      case "AVAILABLE":
+        return {
+          text: "Available",
+          classes: "bg-green-100 text-green-800 border-2 border-green-500",
         };
       default:
         return {
@@ -266,7 +259,7 @@ export default function MyRWAs() {
                       />
                       <div className="absolute top-2 right-2">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                             getStatusDisplay(status).classes
                           }`}
                         >
@@ -285,7 +278,11 @@ export default function MyRWAs() {
 
                     <div className="flex justify-between mb-4">
                       <div className="text-sm font-bold">
-                        ${(parseInt(value) / 1e18).toLocaleString()} ETH
+                        {parseFloat(value || "0") > 0
+                          ? `${(
+                              parseInt(value || "0") / 1e18
+                            ).toLocaleString()} ETH`
+                          : "No loan"}
                       </div>
                       <div className="text-sm">
                         {rwa.yearsOfUsage}{" "}
@@ -293,7 +290,7 @@ export default function MyRWAs() {
                       </div>
                     </div>
 
-                    {status === "valued" ? (
+                    {status === "APPROVED" ? (
                       <Button
                         onClick={(e) => {
                           e.preventDefault();
@@ -301,7 +298,14 @@ export default function MyRWAs() {
                         }}
                         className="w-full border-2 border-black"
                       >
-                        Accept Loan
+                        Request Loan
+                      </Button>
+                    ) : status === "REQUESTED_LOAN_VALIDATED" ? (
+                      <Button
+                        asChild
+                        className="w-full border-2 border-black bg-purple-500 hover:bg-purple-600 text-white"
+                      >
+                        <Link href={`/rwa/${rwa.id}`}>Review Loan Offer</Link>
                       </Button>
                     ) : (
                       <Button

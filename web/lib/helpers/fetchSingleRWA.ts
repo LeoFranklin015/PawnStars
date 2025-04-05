@@ -1,74 +1,36 @@
 import { request, gql } from "graphql-request";
 import { GRAPH_URL } from "../const";
 
-export interface RWA {
-  id: string;
-  productName: string;
-  imageHash: string;
-  yearsOfUsage: string;
-  status: string;
-  documentHash: string;
-  tokenURI: string;
-  createdAt: string;
-  lastUpdated: string;
-  owner: {
-    id: string;
-    isVerified: boolean;
-    name: string;
-    proof: string;
-    createdAt: string;
-    lastUpdated: string;
-  };
-  loans: {
-    id: string;
-    amount: string;
-    requestedAmount: string;
-    valuation: string;
-    interestRate: string;
-    startTime: string;
-    dueTime: string;
-    repaymentAmount: string;
-    repaymentTime: string;
-    status: string;
-    createdAt: string;
-    lastUpdated: string;
-  }[];
-}
-
-export const fetchSingleRWA = async (id: string): Promise<RWA | null> => {
+export const fetchSingleRWA = async (id: string): Promise<any | null> => {
   const query = gql`
     query GetRWA($id: String!) {
       rwas(where: { id: $id }) {
-        id
-        productName
-        imageHash
-        yearsOfUsage
-        status
-        documentHash
-        tokenURI
         createdAt
+        documentHash
+        id
+        imageHash
         lastUpdated
-        owner {
-          id
-          isVerified
-          name
-          proof
-          createdAt
-          lastUpdated
-        }
-        loans(orderBy: createdAt, orderDirection: desc) {
-          id
+        status
+        productName
+        tokenURI
+        yearsOfUsage
+        loans {
           amount
-          requestedAmount
-          valuation
-          interestRate
-          startTime
+          createdAt
           dueTime
+          id
+          interestRate
+          lastUpdated
           repaymentAmount
           repaymentTime
+          requestedAmount
+          startTime
           status
-          createdAt
-          lastUpdated
+          valuation
+        }
+        owner {
+          id
+          name
         }
       }
     }

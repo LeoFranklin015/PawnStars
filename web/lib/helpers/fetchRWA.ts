@@ -6,19 +6,32 @@ export const fetchRWAs = async (address: string) => {
   const query = gql`
     query GetUserRWAs($address: String!) {
       rwas(where: { owner_: { id: $address } }) {
-        id
-        productName
-        imageHash
-        yearsOfUsage
-        status
-        documentHash
-        tokenURI
         createdAt
+        documentHash
+        id
+        imageHash
         lastUpdated
-        loans(orderBy: createdAt, orderDirection: desc, first: 1) {
-          id
-          status
+        status
+        productName
+        tokenURI
+        yearsOfUsage
+        loans {
           amount
+          createdAt
+          dueTime
+          id
+          interestRate
+          lastUpdated
+          repaymentAmount
+          repaymentTime
+          requestedAmount
+          startTime
+          status
+          valuation
+        }
+        owner {
+          id
+          name
         }
       }
     }

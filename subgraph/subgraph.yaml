@@ -8,7 +8,7 @@ dataSources:
     name: Issuer
     network: hashkeychain-sepolia
     source:
-      address: "0x59489c33742C86f349896958b47CC45D86671B98"
+      address: "0x4Bac3740e3980731f041983B61C075a2D316e78A"
       abi: Issuer
       startBlock: 010323033
     mapping:
@@ -32,7 +32,7 @@ dataSources:
     name: UniversalKYC
     network: hashkeychain-sepolia
     source:
-      address: "0x13830FbC6270adefDeB1D5913bD782a0F86E4920" # Replace with actual address
+      address: "0x5A47902ceb0AEbF11D18df3b88209E735Deb708C" # Replace with actual address
       abi: UniversalKYC
       startBlock: 010323033
     mapping:
@@ -53,7 +53,7 @@ dataSources:
     name: RWA
     network: hashkeychain-sepolia
     source:
-      address: "0xD62378A75CfED3644D39Bce139A40d3B27027Fb1" # Replace with actual address
+      address: "0xB1b866325B97367cBA86C2428400C1311907d7bb" # Replace with actual address
       abi: RWA
       startBlock: 010322733
     mapping:
@@ -74,7 +74,7 @@ dataSources:
     name: LendingProtocol
     network: hashkeychain-sepolia
     source:
-      address: "0xb2960d2Bc3b789E0383656029a06ED6e775dFC7e" # Replace with actual address
+      address: "0x8A5fA1b0A754Ca969a748bF507b41c76aB43DC97" # Replace with actual address
       abi: LendingProtocol
       startBlock: 010323033
     mapping:

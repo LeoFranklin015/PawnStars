@@ -3,6 +3,7 @@ import { GRAPH_URL } from "../const";
 
 export const fetchVerifiedUser = async (
   address: string
+  /* eslint-disable @typescript-eslint/no-explicit-any */
 ): Promise<any | null> => {
   const query = gql`
     query MyQuery {
@@ -19,6 +20,7 @@ export const fetchVerifiedUser = async (
   };
 
   try {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     const data: any = await request(GRAPH_URL, query, variables);
     console.log("Fetched RWA:", data);
     if (data.user.isVerified) {

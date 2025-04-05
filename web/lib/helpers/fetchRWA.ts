@@ -42,11 +42,13 @@ export const fetchRWAs = async (address: string) => {
   };
 
   try {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     const data: any = await request(GRAPH_URL, query, variables);
     console.log("Fetched RWAs:", data);
 
     // Get contract status for each RWA
     const rwasWithStatus = await Promise.all(
+      /* eslint-disable @typescript-eslint/no-explicit-any */
       data.rwas.map(async (rwa: any) => {
         const status = await publicClient.readContract({
           address: ISSUER_CONTRACT_ADDRESS,

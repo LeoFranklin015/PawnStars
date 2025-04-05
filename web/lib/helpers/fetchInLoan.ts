@@ -1,6 +1,5 @@
 import { request, gql } from "graphql-request";
-import { GRAPH_URL, ISSUER_ABI, ISSUER_CONTRACT_ADDRESS } from "../const";
-import { publicClient } from "../client";
+import { GRAPH_URL } from "../const";
 
 export const fetchInLoan = async () => {
   const query = gql`
@@ -38,6 +37,7 @@ export const fetchInLoan = async () => {
   `;
 
   try {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     const data: any = await request(GRAPH_URL, query);
     console.log("Fetched IN_LOAN RWAs:", data);
     return data.rwas || [];

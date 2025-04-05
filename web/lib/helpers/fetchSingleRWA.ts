@@ -1,6 +1,7 @@
 import { request, gql } from "graphql-request";
 import { GRAPH_URL } from "../const";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const fetchSingleRWA = async (id: string): Promise<any | null> => {
   const query = gql`
     query GetRWA($id: String!) {
@@ -41,6 +42,7 @@ export const fetchSingleRWA = async (id: string): Promise<any | null> => {
   };
 
   try {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     const data: any = await request(GRAPH_URL, query, variables);
     console.log("Fetched RWA:", data);
     return data.rwas[0] || null;

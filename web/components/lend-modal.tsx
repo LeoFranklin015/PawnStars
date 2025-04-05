@@ -5,10 +5,7 @@ import type React from "react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { X, CheckCircle, Info } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { publicClient, walletClient } from "@/lib/client";
 import {
@@ -38,8 +35,6 @@ interface LendModalProps {
 }
 
 export default function LendModal({ rwa, onClose }: LendModalProps) {
-  const router = useRouter();
-  const [requestedAmount, setRequestedAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const { address } = useAccount();

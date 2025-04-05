@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import LendModal from "@/components/lend-modal";
 import Image from "next/image";
 import { fetchSingleRWA } from "@/lib/helpers/fetchSingleRWA";
@@ -16,10 +15,9 @@ import {
   RWA_CONTRACT_ADDRESS,
 } from "@/lib/const";
 import { useAccount } from "wagmi";
-import { erc20Abi, erc721Abi } from "viem";
 
 export default function RWADetails({ params }: { params: { id: string } }) {
-  const router = useRouter();
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const [rwa, setRWA] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLendModal, setShowLendModal] = useState(false);

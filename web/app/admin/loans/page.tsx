@@ -12,8 +12,6 @@ import {
 } from "@/components/ui/table";
 import { publicClient, walletClient } from "@/lib/client";
 import {
-  ISSUER_ABI,
-  ISSUER_CONTRACT_ADDRESS,
   LENDING_PROTOCOL_CONTRACT_ADDRESS,
   LendingProtocolABI,
 } from "@/lib/const";

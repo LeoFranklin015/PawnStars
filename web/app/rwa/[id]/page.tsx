@@ -15,10 +15,12 @@ import {
   RWA_CONTRACT_ADDRESS,
 } from "@/lib/const";
 import { useAccount } from "wagmi";
+import { PinataSDK } from "pinata";
 
 export default function RWADetails({ params }: { params: { id: string } }) {
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const [rwa, setRWA] = useState<any | null>(null);
+  const [imageUrl, setImageUrl] = useState<string>("/placeholder.svg");
   const [loading, setLoading] = useState(true);
   const [showLendModal, setShowLendModal] = useState(false);
   const [isAcceptingOffer, setIsAcceptingOffer] = useState(false);
@@ -39,6 +41,53 @@ export default function RWADetails({ params }: { params: { id: string } }) {
 
     loadRWA();
   }, [params.id]);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      if (!rwa || !rwa.imageHash) {
+        setImageUrl("/placeholder.svg");
+        return;
+      }
+
+      try {
+        const pinata = new PinataSDK({
+          pinataJwt:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJlOTJkMDk2Ni1lZjI3LTQ2NzEtYWM2ZS0zZTE1N2M4ODFkNjYiLCJlbWFpbCI6ImNvY2xlbzE1QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiI5ZTY0YTQ5NjZmYWI2NWJjOWQwZSIsInNjb3BlZEtleVNlY3JldCI6IjEyMWViNjQ1ZjBjNzYxNmJhMWZlYzE2MDdhODdhY2EyM2NiZDg2MTE4YTMzMjQ1NTg4MmExMWVlZDc0ZDM4MGMiLCJleHAiOjE3NzUzNTgxNTF9.wSV-uVK6VVXBB0fADd53QKL5ZuWJa0Cdi6VfevN3vfY",
+          pinataGateway: "orange-select-opossum-767.mypinata.cloud",
+        });
+
+        const { data: imageData, contentType } =
+          await pinata.gateways.private.get(rwa.imageHash);
+        console.log("Fetched image data for RWA ID:", rwa.id);
+
+        if (imageData) {
+          const blobUrl = URL.createObjectURL(
+            new Blob([imageData as Blob], {
+              type: contentType || "image/png",
+            })
+          );
+
+          setImageUrl(blobUrl);
+        } else {
+          setImageUrl("/placeholder.svg");
+        }
+      } catch (error) {
+        console.error(`Failed to fetch image for RWA ${rwa.id}:`, error);
+        setImageUrl("/placeholder.svg");
+      }
+    };
+
+    if (rwa) {
+      fetchImage();
+    }
+
+    // Cleanup function to revoke object URLs to prevent memory leaks
+    return () => {
+      if (imageUrl && imageUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, [rwa, imageUrl]);
 
   const handleAcceptOffer = async () => {
     setIsAcceptingOffer(true);
@@ -77,11 +126,8 @@ export default function RWADetails({ params }: { params: { id: string } }) {
     setIsOfferAccepted(true);
   };
 
-  const getImageUrl = (rwa: any) => {
-    if (rwa.imageHash && rwa.imageHash !== "") {
-      return `/placeholder.svg?height=400&width=600`;
-    }
-    return "/placeholder.svg?height=400&width=600";
+  const getImageUrl = () => {
+    return imageUrl || "/placeholder.svg?height=400&width=600";
   };
 
   const getRWAStatus = (rwa: any) => {
@@ -149,7 +195,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
             <div className="bg-white rounded-lg border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden">
               <div className="relative">
                 <Image
-                  src={getImageUrl(rwa)}
+                  src={getImageUrl()}
                   alt={rwa.productName}
                   width={600}
                   height={400}

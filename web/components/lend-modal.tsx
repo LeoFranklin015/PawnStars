@@ -10,14 +10,26 @@ import { Label } from "@/components/ui/label";
 import { X, CheckCircle, Info } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { publicClient, walletClient } from "@/lib/client";
+import {
+  LENDING_PROTOCOL_CONTRACT_ADDRESS,
+  LendingProtocolABI,
+} from "@/lib/const";
+import { useAccount } from "wagmi";
 
 interface RWA {
   id: string;
-  name: string;
-  image: string;
-  value: number;
+  productName: string;
+  imageHash: string;
+  yearsOfUsage: string;
   status: string;
-  yearsOfUsage: number;
+  documentHash: string;
+  tokenURI: string;
+  loans: {
+    id: string;
+    status: string;
+    amount: string;
+  }[];
 }
 
 interface LendModalProps {
@@ -30,25 +42,41 @@ export default function LendModal({ rwa, onClose }: LendModalProps) {
   const [requestedAmount, setRequestedAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const { address } = useAccount();
+
+  console.log(rwa);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsComplete(true);
-
-      // Redirect after showing success
-      setTimeout(() => {
-        onClose();
-        router.push(`/rwa/${rwa.id}`);
-      }, 2000);
-    }, 1500);
+    const rwaId = parseInt(rwa.id) - 1;
+    console.log(rwaId);
+    const tx = await walletClient?.writeContract({
+      address: LENDING_PROTOCOL_CONTRACT_ADDRESS,
+      abi: LendingProtocolABI,
+      functionName: "requestLoan",
+      args: [BigInt(rwaId)],
+      account: address as `0x${string}`,
+    });
+    console.log(tx);
+    await publicClient.waitForTransactionReceipt({ hash: tx! });
+    console.log("Transaction complete");
+    setIsComplete(true);
+    setIsSubmitting(false);
   };
 
-  const maxLoanAmount = Math.floor(rwa.value * 0.6);
+  const getImageUrl = (rwa: RWA) => {
+    if (rwa.imageHash && rwa.imageHash !== "") {
+      return `/placeholder.svg?height=200&width=300`;
+    }
+    return "/placeholder.svg?height=200&width=300";
+  };
+
+  // Get the latest loan amount or use a default value
+  const latestLoan = rwa.loans && rwa.loans[0];
+  const value = latestLoan ? parseInt(latestLoan.amount) / 1e18 : 0;
+  const maxLoanAmount = Math.floor(value * 0.6);
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -84,16 +112,16 @@ export default function LendModal({ rwa, onClose }: LendModalProps) {
               <div className="space-y-4 mb-6">
                 <div className="flex items-center mb-4">
                   <Image
-                    src={rwa.image || "/placeholder.svg"}
-                    alt={rwa.name}
+                    src={getImageUrl(rwa)}
+                    alt={rwa.productName}
                     width={400}
                     height={300}
                     className="w-20 h-20 object-cover rounded-md border-2 border-black mr-4"
                   />
                   <div>
-                    <h3 className="font-bold text-lg">{rwa.name}</h3>
+                    <h3 className="font-bold text-lg">{rwa.productName}</h3>
                     <p className="text-gray-600">
-                      Value: ${rwa.value.toLocaleString()}
+                      Value: {value.toLocaleString()} ETH
                     </p>
                   </div>
                 </div>
@@ -103,31 +131,9 @@ export default function LendModal({ rwa, onClose }: LendModalProps) {
                     <Info className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0" />
                     <p className="text-blue-700 text-sm">
                       {`You can request up to 60% of your asset's value as a loan.
-                      The maximum amount available is ${maxLoanAmount.toLocaleString()}.`}
+                      The maximum amount available is ${maxLoanAmount.toLocaleString()} ETH.`}
                     </p>
                   </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="requestedAmount" className="font-bold">
-                    Requested Loan Amount (USD)
-                  </Label>
-                  <Input
-                    id="requestedAmount"
-                    type="number"
-                    min="1"
-                    max={maxLoanAmount}
-                    value={requestedAmount}
-                    onChange={(e) => setRequestedAmount(e.target.value)}
-                    placeholder={`Max ${maxLoanAmount}`}
-                    required
-                    className="mt-1"
-                  />
-                  {Number(requestedAmount) > maxLoanAmount && (
-                    <p className="text-red-500 text-sm mt-1">
-                      Amount exceeds maximum loan value
-                    </p>
-                  )}
                 </div>
 
                 <div className="bg-yellow-100 p-4 rounded-md border-2 border-yellow-300">
@@ -151,11 +157,7 @@ export default function LendModal({ rwa, onClose }: LendModalProps) {
 
                 <Button
                   type="submit"
-                  disabled={
-                    isSubmitting ||
-                    !requestedAmount ||
-                    Number(requestedAmount) > maxLoanAmount
-                  }
+                  disabled={isSubmitting}
                   className="flex-1"
                 >
                   {isSubmitting ? (

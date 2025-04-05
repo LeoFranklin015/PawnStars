@@ -132,12 +132,3 @@ export const RequestKYC = async (
     throw error;
   }
 };
-
-RequestKYC(
-  1,
-  "0x1234567890123456789012345678901234567890",
-  1,
-  "Product Name",
-  "bafkreib5ulhzuieyxgl7464udhgfztzdbd4nmiexyht627s2p7dcf6ggxy",
-  "bafkreibsl6wnownf7a4n2tp52zkxsogonf2gs6zj6n4nsulgpnahtvn4ka"
-);

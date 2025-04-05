@@ -19,7 +19,6 @@ contract LendingProtocol is Ownable {
     struct LoanRequest {
         address borrower;
         uint256 rwaId;
-        uint256 requestedAmount;
         uint256 valuation;
         bool isActive;
         bool isFilled;
@@ -55,21 +54,19 @@ contract LendingProtocol is Ownable {
     }
     
     // Function to request a loan using RWA as collateral
-    function requestLoan(uint256 _rwaId, uint256 _amount) external  {
+    function requestLoan(uint256 _rwaId) external  {
         require(rwaToken.ownerOf(_rwaId) == msg.sender, "Not the RWA owner");
-        require(_amount > 0, "Amount must be greater than 0");
         
         loanRequests[loanRequestCounter] = LoanRequest({
             borrower: msg.sender,
             rwaId: _rwaId,
-            requestedAmount: _amount,
             valuation: 0,
             isActive: true,
             isFilled: false,
             isAccepted: false
         });
         
-        emit LoanRequested(msg.sender, _rwaId, _amount, loanRequestCounter, 0);
+        emit LoanRequested(msg.sender, _rwaId, 0, loanRequestCounter, 0);
         loanRequestCounter++;
     }
     
@@ -107,7 +104,7 @@ contract LendingProtocol is Ownable {
         // Mark request as accepted
         request.isAccepted = true;
         
-        emit LoanAccepted(_requestId, msg.sender, request.rwaId, request.requestedAmount, request.valuation);
+        emit LoanAccepted(_requestId, msg.sender, request.rwaId, maxLoanAmount, request.valuation);
     }
     
     // Function to issue a loan after acceptance
@@ -121,7 +118,7 @@ contract LendingProtocol is Ownable {
         loans[loanCounter] = Loan({
             borrower: request.borrower,
             rwaId: request.rwaId,
-            amount: request.requestedAmount,
+            amount: request.valuation,
             interestRate: 500, // 5% annual interest rate (500 basis points)
             startTime: block.timestamp,
             dueTime: block.timestamp + 365 days, // 1 year term
@@ -132,9 +129,9 @@ contract LendingProtocol is Ownable {
         request.isFilled = true;
         
         // Transfer USDC to borrower
-        require(usdcToken.transfer(request.borrower, request.requestedAmount), "USDC transfer failed");
+        require(usdcToken.transfer(request.borrower, request.valuation), "USDC transfer failed");
         
-        emit LoanIssued(loanCounter, request.borrower, request.rwaId, request.requestedAmount, 500, block.timestamp + 365 days);
+        emit LoanIssued(loanCounter, request.borrower, request.rwaId, request.valuation, 500, block.timestamp + 365 days);
         loanCounter++;
     }
     

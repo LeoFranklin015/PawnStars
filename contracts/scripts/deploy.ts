@@ -15,7 +15,7 @@ async function main() {
   await universalKYC.verifyUser(
     "0x4b4b30e2E7c6463b03CdFFD6c42329D357205334",
     "0x0000000000000000000000000000000000000000000000000000000000000000",
-    "LeoFranklin"
+    "Leo Franklin"
   );
 
   const RWA = await ethers.getContractFactory("RWA");
@@ -69,12 +69,12 @@ async function main() {
 
   console.log("--------------------------------------------");
 
-  // Requesting RWA
-  await issuer.requestRWA("Iphone 14", "14", 2, "hkhkhvka");
-  console.log("RWA requested");
-  // Approving RWA
-  await issuer.approveRWA(0);
-  console.log("RWA approved");
+  // // Requesting RWA
+  // await issuer.requestRWA("Iphone 14", "14", 2, "hkhkhvka");
+  // console.log("RWA requested");
+  // // Approving RWA
+  // await issuer.approveRWA(0);
+  // console.log("RWA approved");
 }
 
 main().catch((error) => {

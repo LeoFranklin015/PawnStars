@@ -8,7 +8,7 @@ const main = async () => {
     const config = [
       {
         providerUrl: "wss://hashkeychain-testnet.alt.technology/ws",
-        contractAddress: "0x5e00488D2E7b887d2583F2657ce6816875C4De30",
+        contractAddress: "0x777daF7c87a2E8DA1822bC563e04Fa8C6d724BDC", // Issuer
         chainId: 133,
       },
     ];

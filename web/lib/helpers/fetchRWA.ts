@@ -3,25 +3,36 @@ import { GRAPH_URL } from "../const";
 
 export const fetchRWAs = async (address: string) => {
   const query = gql`
-    query MyQuery {
-      rwas(
-        where: { owner_: { id: "${address}" } }
-      ) {
-        createdAt
-        documentHash
-        lastUpdated
+    query GetUserRWAs($address: String!) {
+      rwas(where: { owner_: { id: $address } }) {
         id
-        imageHash
         productName
-        status
+        imageHash
         yearsOfUsage
+        status
+        documentHash
         tokenURI
+        createdAt
+        lastUpdated
+        loans(orderBy: createdAt, orderDirection: desc, first: 1) {
+          id
+          status
+          amount
+        }
       }
     }
   `;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const data: any = await request(GRAPH_URL, query);
-  console.log(data);
-  return data.rwas[0];
+  const variables = {
+    address: address.toLowerCase(),
+  };
+
+  try {
+    const data: any = await request(GRAPH_URL, query, variables);
+    console.log("Fetched RWAs:", data);
+    return data.rwas;
+  } catch (error) {
+    console.error("Error fetching RWAs:", error);
+    return [];
+  }
 };

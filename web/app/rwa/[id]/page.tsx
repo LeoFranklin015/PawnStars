@@ -1,41 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import LendModal from "@/components/lend-modal";
 import Image from "next/image";
+import { fetchSingleRWA, type RWA } from "@/lib/helpers/fetchSingleRWA";
 
-// Mock data for a single RWA
-const mockRWA = {
-  id: "1",
-  name: "Vintage Rolex Watch",
-  image: "/placeholder.svg?height=400&width=600",
-  value: 12000,
-  status: "lending", // available, lending, approved
-  yearsOfUsage: 5,
-  createdAt: "2023-10-15",
-  description:
-    "Authentic Rolex Submariner in excellent condition. Includes original box and papers. Serial number verified. Minor scratches on the bracelet from normal wear.",
-  loanDetails: {
-    requestedAmount: 7000,
-    interestRate: 5,
-    startDate: null,
-    dueDate: null,
-    status: "pending", // pending, active, repaid
-    lenderOffer: 6500,
-    offerAccepted: false,
-  },
-};
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export default function RWADetails({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const [rwa, setRWA] = useState<RWA | null>(null);
+  const [loading, setLoading] = useState(true);
   const [showLendModal, setShowLendModal] = useState(false);
   const [isAcceptingOffer, setIsAcceptingOffer] = useState(false);
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
+
+  useEffect(() => {
+    const loadRWA = async () => {
+      try {
+        const data = await fetchSingleRWA(params.id);
+        setRWA(data);
+      } catch (error) {
+        console.error("Error loading RWA:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRWA();
+  }, [params.id]);
 
   const handleAcceptOffer = () => {
     setIsAcceptingOffer(true);
@@ -46,6 +41,50 @@ export default function RWADetails({ params }: { params: { id: string } }) {
       setIsOfferAccepted(true);
     }, 1500);
   };
+
+  const getImageUrl = (rwa: RWA) => {
+    if (rwa.imageHash && rwa.imageHash !== "") {
+      return `https://ipfs.io/ipfs/${rwa.imageHash}`;
+    }
+    return "/placeholder.svg?height=400&width=600";
+  };
+
+  const getRWAStatus = (rwa: RWA) => {
+    if (rwa.loans && rwa.loans.length > 0) {
+      const latestLoan = rwa.loans[0];
+      if (latestLoan.status === "ACTIVE") {
+        return "lending";
+      }
+    }
+    return "available";
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen py-12 px-4 dotted-background">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-4">Loading...</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (!rwa) {
+    return (
+      <div className="min-h-screen py-12 px-4 dotted-background">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-4">RWA not found</h1>
+          <Button asChild variant="outline">
+            <Link href="/my-rwas">Back to My RWAs</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const status = getRWAStatus(rwa);
+  const latestLoan = rwa.loans && rwa.loans[0];
+  const value = latestLoan ? parseInt(latestLoan.amount) / 1e18 : 0;
 
   return (
     <div className="min-h-screen py-12 px-4 dotted-background">
@@ -68,8 +107,8 @@ export default function RWADetails({ params }: { params: { id: string } }) {
             <div className="bg-white rounded-lg border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden">
               <div className="relative">
                 <Image
-                  src={mockRWA.image || "/placeholder.svg"}
-                  alt={mockRWA.name}
+                  src={getImageUrl(rwa)}
+                  alt={rwa.productName}
                   width={600}
                   height={400}
                   className="w-full h-auto rounded-lg border-2 border-black mb-6"
@@ -77,12 +116,12 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                 <div className="absolute top-4 right-4">
                   <span
                     className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                      mockRWA.status === "available"
+                      status === "available"
                         ? "bg-green-100 text-green-800 border-2 border-green-500"
                         : "bg-blue-100 text-blue-800 border-2 border-blue-500"
                     }`}
                   >
-                    {mockRWA.status === "available"
+                    {status === "available"
                       ? "Available"
                       : "In Lending Process"}
                   </span>
@@ -90,7 +129,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
               </div>
 
               <div className="p-6">
-                <h1 className="text-2xl font-bold mb-4">{mockRWA.name}</h1>
+                <h1 className="text-2xl font-bold mb-4">{rwa.productName}</h1>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-gray-100 p-3 rounded-lg border-2 border-gray-200">
@@ -98,7 +137,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                       Estimated Value
                     </span>
                     <div className="font-bold">
-                      ${mockRWA.value.toLocaleString()}
+                      {value.toLocaleString()} ETH
                     </div>
                   </div>
 
@@ -106,19 +145,21 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                     <span className="text-sm text-gray-500">
                       Years of Usage
                     </span>
-                    <div className="font-bold">
-                      {mockRWA.yearsOfUsage} years
-                    </div>
+                    <div className="font-bold">{rwa.yearsOfUsage} years</div>
                   </div>
                 </div>
 
                 <div className="mb-6">
                   <h2 className="text-lg font-bold mb-2">Description</h2>
-                  <p className="text-gray-700">{mockRWA.description}</p>
+                  <p className="text-gray-700">
+                    Token URI: {rwa.tokenURI}
+                    <br />
+                    Document Hash: {rwa.documentHash}
+                  </p>
                 </div>
 
                 <div className="flex gap-4">
-                  {mockRWA.status === "available" ? (
+                  {status === "available" ? (
                     <Button
                       onClick={() => setShowLendModal(true)}
                       className="flex-1 border-2 border-black"
@@ -144,7 +185,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
               <div className="p-6">
                 <h2 className="text-lg font-bold mb-4">Loan Status</h2>
 
-                {mockRWA.status === "available" ? (
+                {status === "available" ? (
                   <div className="flex items-center justify-center py-8 text-center">
                     <div>
                       <p className="text-gray-600 mb-4">
@@ -160,26 +201,30 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Requested Amount:</span>
                       <span className="font-bold">
-                        ${mockRWA.loanDetails.requestedAmount.toLocaleString()}
+                        {(
+                          parseInt(latestLoan.requestedAmount) / 1e18
+                        ).toLocaleString()}{" "}
+                        ETH
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Interest Rate:</span>
                       <span className="font-bold">
-                        {mockRWA.loanDetails.interestRate}% APR
+                        {(parseInt(latestLoan.interestRate) / 100).toFixed(2)}%
+                        APR
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Status:</span>
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border-2 border-yellow-300">
-                        Pending
+                        {latestLoan.status}
                       </span>
                     </div>
 
-                    {mockRWA.loanDetails.lenderOffer &&
-                      !mockRWA.loanDetails.offerAccepted &&
+                    {latestLoan.valuation &&
+                      latestLoan.status === "VALUED" &&
                       !isOfferAccepted && (
                         <div className="mt-6 p-4 bg-yellow-100 rounded-md border-2 border-yellow-300">
                           <div className="flex items-start">
@@ -197,8 +242,10 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                                   Offered Amount:
                                 </span>
                                 <span className="font-bold text-yellow-800">
-                                  $
-                                  {mockRWA.loanDetails.lenderOffer.toLocaleString()}
+                                  {(
+                                    parseInt(latestLoan.valuation) / 1e18
+                                  ).toLocaleString()}{" "}
+                                  ETH
                                 </span>
                               </div>
                               <div className="flex gap-2">
@@ -241,8 +288,10 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                             <div className="flex justify-between items-center">
                               <span className="text-green-800">Amount:</span>
                               <span className="font-bold text-green-800">
-                                $
-                                {mockRWA.loanDetails.lenderOffer.toLocaleString()}
+                                {(
+                                  parseInt(latestLoan.valuation) / 1e18
+                                ).toLocaleString()}{" "}
+                                ETH
                               </span>
                             </div>
                           </div>
@@ -268,12 +317,14 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                     <div>
                       <p className="font-medium">RWA Created</p>
                       <p className="text-sm text-gray-500">
-                        {new Date(mockRWA.createdAt).toLocaleDateString()}
+                        {new Date(
+                          parseInt(rwa.createdAt) * 1000
+                        ).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
 
-                  {mockRWA.status !== "available" && (
+                  {latestLoan && (
                     <div className="relative mb-6">
                       <div className="absolute left-[-24px] top-0 h-6 w-6 rounded-full bg-green-100 border-2 border-green-500 flex items-center justify-center">
                         <CheckCircle className="h-3 w-3 text-green-500" />
@@ -282,22 +333,40 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                         <p className="font-medium">Loan Requested</p>
                         <p className="text-sm text-gray-500">
                           {new Date(
-                            new Date(mockRWA.createdAt).getTime() + 86400000
+                            parseInt(latestLoan.createdAt) * 1000
                           ).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
                   )}
 
-                  {isOfferAccepted && (
+                  {latestLoan && latestLoan.status === "ACTIVE" && (
                     <div className="relative mb-6">
                       <div className="absolute left-[-24px] top-0 h-6 w-6 rounded-full bg-green-100 border-2 border-green-500 flex items-center justify-center">
                         <CheckCircle className="h-3 w-3 text-green-500" />
                       </div>
                       <div>
-                        <p className="font-medium">Offer Accepted</p>
+                        <p className="font-medium">Loan Active</p>
                         <p className="text-sm text-gray-500">
-                          {new Date().toLocaleDateString()}
+                          {new Date(
+                            parseInt(latestLoan.startTime) * 1000
+                          ).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {latestLoan && latestLoan.status === "REPAID" && (
+                    <div className="relative mb-6">
+                      <div className="absolute left-[-24px] top-0 h-6 w-6 rounded-full bg-green-100 border-2 border-green-500 flex items-center justify-center">
+                        <CheckCircle className="h-3 w-3 text-green-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Loan Repaid</p>
+                        <p className="text-sm text-gray-500">
+                          {new Date(
+                            parseInt(latestLoan.repaymentTime) * 1000
+                          ).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -310,7 +379,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
       </div>
 
       {showLendModal && (
-        <LendModal rwa={mockRWA} onClose={() => setShowLendModal(false)} />
+        <LendModal rwa={rwa} onClose={() => setShowLendModal(false)} />
       )}
     </div>
   );

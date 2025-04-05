@@ -54,7 +54,7 @@ export class HashKeyRWAVerifier {
           requester,
           yearsOfUsage,
           productName,
-          productModel,
+          imageHash,
           documentHash
         ) => {
           try {
@@ -63,7 +63,7 @@ export class HashKeyRWAVerifier {
               requester,
               yearsOfUsage,
               productName,
-              productModel,
+              imageHash,
               documentHash
             );
           } catch (error) {

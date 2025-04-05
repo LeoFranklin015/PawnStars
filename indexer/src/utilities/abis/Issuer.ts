@@ -19,10 +19,34 @@ export const IssuerAbi = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         internalType: "uint256",
         name: "requestId",
         type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "requester",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "productName",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "productModel",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "documentHash",
+        type: "string",
       },
     ],
     name: "RWAApproved",
@@ -32,13 +56,13 @@ export const IssuerAbi = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         internalType: "uint256",
         name: "requestId",
         type: "uint256",
       },
       {
-        indexed: false,
+        indexed: true,
         internalType: "address",
         name: "requester",
         type: "address",
@@ -58,7 +82,7 @@ export const IssuerAbi = [
       {
         indexed: false,
         internalType: "string",
-        name: "productModel",
+        name: "imageHash",
         type: "string",
       },
       {
@@ -119,7 +143,7 @@ export const IssuerAbi = [
       },
       {
         internalType: "string",
-        name: "_productModel",
+        name: "_imageHash",
         type: "string",
       },
       {
@@ -186,7 +210,7 @@ export const IssuerAbi = [
       },
       {
         internalType: "string",
-        name: "productModel",
+        name: "imageHash",
         type: "string",
       },
       {

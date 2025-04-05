@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X, CheckCircle2 } from "lucide-react";
 import { useUserStore } from "@/lib/stores/user-store";
+import { CustomConnectButton } from "./ConnectButton";
 
 interface NavbarProps {
   onVerify: () => void;
@@ -45,28 +46,7 @@ export default function Navbar({ onVerify }: NavbarProps) {
 
           {/* Auth section */}
           <div className="hidden md:flex items-center">
-            {isLoggedIn ? (
-              <div className="flex items-center gap-4">
-                <div className="flex items-center border-2 border-black rounded-full px-3 py-1 bg-gray-100">
-                  <span className="font-bold">{user?.username || "User"}</span>
-                  {user?.isVerified && (
-                    <CheckCircle2 className="h-4 w-4 text-green-500 ml-1" />
-                  )}
-                </div>
-                <Button onClick={logout} variant="outline">
-                  Logout
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-4">
-                <Button variant="outline" asChild>
-                  <Link href="/login">Login</Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/register">Sign Up</Link>
-                </Button>
-              </div>
-            )}
+            <CustomConnectButton />
           </div>
 
           {/* Mobile menu button */}
@@ -102,44 +82,7 @@ export default function Navbar({ onVerify }: NavbarProps) {
               </Link>
             ))}
 
-            {isLoggedIn ? (
-              <>
-                <div className="px-3 py-2 font-medium">
-                  {user?.username || "User"}
-                  {user?.isVerified && (
-                    <CheckCircle2 className="h-4 w-4 text-green-500 ml-1 inline" />
-                  )}
-                </div>
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <div className="pt-4 flex flex-col space-y-2 px-3">
-                <Button asChild variant="outline" className="w-full">
-                  <Link
-                    href="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Login
-                  </Link>
-                </Button>
-                <Button asChild className="w-full">
-                  <Link
-                    href="/register"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Sign Up
-                  </Link>
-                </Button>
-              </div>
-            )}
+            <CustomConnectButton />
           </div>
         </div>
       )}

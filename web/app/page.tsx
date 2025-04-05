@@ -72,8 +72,8 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="text-sm text-gray-600">
-                  <span className="font-bold text-black">500+</span> customers
-                  trusted us this month
+                  <span className="font-bold text-black">People</span> started
+                  to bring thier Real World Assets onchain
                 </p>
               </div>
             </motion.div>

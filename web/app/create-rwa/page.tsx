@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, FileText, CheckCircle } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  CheckCircle,
+  Loader,
+  ArrowRight,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { PinataSDK } from "pinata-web3";
@@ -17,6 +23,16 @@ import { ISSUER_ABI, ISSUER_CONTRACT_ADDRESS } from "@/lib/const";
 import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import Image from "next/image";
+
+// Define step types for the creation process
+type StepStatus = "pending" | "loading" | "complete" | "error";
+
+interface Step {
+  id: number;
+  title: string;
+  description: string;
+  status: StepStatus;
+}
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export default function CreateRWA() {
@@ -32,6 +48,33 @@ export default function CreateRWA() {
   const [yearsOfUsage, setYearsOfUsage] = useState<number | null>(null);
   const [description, setDescription] = useState<string | null>(null);
   const [estimatedValue, setEstimatedValue] = useState<number | null>(null);
+  const [currentStep, setCurrentStep] = useState<number>(0);
+  const [steps, setSteps] = useState<Step[]>([
+    {
+      id: 1,
+      title: "Upload Product Image",
+      description: "Uploading image to IPFS via Pinata",
+      status: "pending",
+    },
+    {
+      id: 2,
+      title: "Upload Ownership Proof",
+      description: "Uploading document to IPFS via Pinata",
+      status: "pending",
+    },
+    {
+      id: 3,
+      title: "Creating RWA Token",
+      description: "Submitting transaction to blockchain",
+      status: "pending",
+    },
+    {
+      id: 4,
+      title: "Confirming Transaction",
+      description: "Waiting for confirmation",
+      status: "pending",
+    },
+  ]);
 
   const { address } = useAccount();
 
@@ -89,6 +132,13 @@ export default function CreateRWA() {
     }
   };
 
+  // Function to update step status
+  const updateStepStatus = (stepId: number, status: StepStatus) => {
+    setSteps((prevSteps) =>
+      prevSteps.map((step) => (step.id === stepId ? { ...step, status } : step))
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -108,37 +158,140 @@ export default function CreateRWA() {
       return;
     }
 
-    console.log("Uploading Image to Pinata...");
-    const imageHash = await uploadImageToPinata(imageFile);
-    console.log("Image uploaded to Pinata: ", imageHash);
+    try {
+      // Step 1: Upload image to IPFS
+      setCurrentStep(1);
+      updateStepStatus(1, "loading");
+      console.log("Uploading Image to Pinata...");
+      const imageHash = await uploadImageToPinata(imageFile);
+      console.log("Image uploaded to Pinata: ", imageHash);
+      updateStepStatus(1, "complete");
 
-    console.log("Uploading Proof of Ownership to Pinata...");
-    const proofHash = await uploadImageToPinata(ownershipProof);
-    console.log("Proof of Ownership uploaded to Pinata: ", proofHash);
+      // Step 2: Upload proof document to IPFS
+      setCurrentStep(2);
+      updateStepStatus(2, "loading");
+      console.log("Uploading Proof of Ownership to Pinata...");
+      const proofHash = await uploadImageToPinata(ownershipProof);
+      console.log("Proof of Ownership uploaded to Pinata: ", proofHash);
+      updateStepStatus(2, "complete");
 
-    const yearsOfUsageBigInt = ethers.toBigInt(yearsOfUsage!);
+      const yearsOfUsageBigInt = ethers.toBigInt(yearsOfUsage!);
 
-    console.log("Years of Usage: ", yearsOfUsageBigInt);
-    console.log("Product Name: ", productName);
-    console.log("Image Hash: ", imageHash);
-    console.log("Proof Hash: ", proofHash);
+      console.log("Years of Usage: ", yearsOfUsageBigInt);
+      console.log("Product Name: ", productName);
+      console.log("Image Hash: ", imageHash);
+      console.log("Proof Hash: ", proofHash);
 
-    // Write to contract
-    const tx = await walletClient?.writeContract({
-      account: address as `0x${string}`,
-      address: ISSUER_CONTRACT_ADDRESS,
-      abi: ISSUER_ABI,
-      functionName: "requestRWA",
-      args: [productName, imageHash, ethers.toBigInt(yearsOfUsage!), proofHash],
-    });
+      // Step 3: Submit transaction to blockchain
+      setCurrentStep(3);
+      updateStepStatus(3, "loading");
+      const tx = await walletClient?.writeContract({
+        account: address as `0x${string}`,
+        address: ISSUER_CONTRACT_ADDRESS,
+        abi: ISSUER_ABI,
+        functionName: "requestRWA",
+        args: [
+          productName,
+          imageHash,
+          ethers.toBigInt(yearsOfUsage!),
+          proofHash,
+        ],
+      });
+      updateStepStatus(3, "complete");
 
-    await publicClient.waitForTransactionReceipt({
-      hash: tx as `0x${string}`,
-    });
+      // Step 4: Wait for transaction confirmation
+      setCurrentStep(4);
+      updateStepStatus(4, "loading");
+      await publicClient.waitForTransactionReceipt({
+        hash: tx as `0x${string}`,
+      });
+      updateStepStatus(4, "complete");
 
-    console.log("Transaction sent: ", tx);
-    setIsSubmitting(false);
-    setIsSuccess(true);
+      console.log("Transaction sent: ", tx);
+      setIsSubmitting(false);
+      setIsSuccess(true);
+    } catch (error) {
+      console.error("Error during RWA creation:", error);
+      // Mark current step as error
+      updateStepStatus(currentStep, "error");
+      setIsSubmitting(false);
+    }
+  };
+
+  // Stepper component for the creation process
+  const StepperUI = () => {
+    return (
+      <div className="mt-8 mb-4">
+        <div className="flex flex-col space-y-6">
+          {steps.map((step) => (
+            <div key={step.id} className="flex items-start">
+              <div className="relative flex flex-col items-center mr-4">
+                <div
+                  className={`h-8 w-8 rounded-full flex items-center justify-center z-10 ${
+                    step.status === "complete"
+                      ? "bg-green-100 border-2 border-green-500"
+                      : step.status === "loading"
+                      ? "bg-blue-100 border-2 border-blue-500"
+                      : step.status === "error"
+                      ? "bg-red-100 border-2 border-red-500"
+                      : "bg-gray-100 border-2 border-gray-300"
+                  }`}
+                >
+                  {step.status === "complete" ? (
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  ) : step.status === "loading" ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                    >
+                      <Loader className="h-4 w-4 text-blue-600" />
+                    </motion.div>
+                  ) : step.status === "error" ? (
+                    <span className="text-red-600 font-bold text-xs">!</span>
+                  ) : (
+                    <span className="text-gray-500">{step.id}</span>
+                  )}
+                </div>
+                {step.id !== steps.length && (
+                  <div
+                    className={`h-14 w-0.5 ${
+                      step.status === "complete"
+                        ? "bg-green-500"
+                        : "bg-gray-300"
+                    }`}
+                  />
+                )}
+              </div>
+              <div className="flex-1">
+                <h3
+                  className={`font-bold ${
+                    step.status === "loading"
+                      ? "text-blue-700"
+                      : step.status === "complete"
+                      ? "text-green-700"
+                      : step.status === "error"
+                      ? "text-red-700"
+                      : "text-gray-700"
+                  }`}
+                >
+                  {step.title}
+                </h3>
+                <p className="text-sm text-gray-500">{step.description}</p>
+                {step.status === "error" && (
+                  <p className="text-xs text-red-600 mt-1">
+                    An error occurred. Please try again.
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -302,6 +455,9 @@ export default function CreateRWA() {
                   </label>
                 </div>
               </div>
+
+              {/* Display stepper when submitting */}
+              {isSubmitting && <StepperUI />}
 
               <div className="pt-4 flex gap-4">
                 <Button

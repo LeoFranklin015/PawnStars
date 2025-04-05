@@ -8,9 +8,9 @@ export default function Self() {
   const { address } = useAccount();
 
   const selfApp = new SelfAppBuilder({
-    appName: "Self Workshop",
+    appName: "PawnStars",
     scope: "self-workshop",
-    endpoint: `https://1d89-111-235-226-130.ngrok-free.app/api/verify`,
+    endpoint: `https://pawnstars.vercel.app/api/verify`,
     logoBase64:
       "https://pluspng.com/img-png/images-owls-png-hd-owl-free-download-png-png-image-485.png",
     userIdType: "hex",

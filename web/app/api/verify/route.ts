@@ -1,12 +1,12 @@
 import { getUserIdentifier } from "@selfxyz/core";
 import { NextResponse } from "next/server";
 import { ethers } from "ethers";
-
+import { KYC_VERIFIER_CONTRACT_ADDRESS } from "@/lib/const";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { proof, publicSignals } = body;
-    const ContractAddress = "0xB35867517ce0D65Db253B8b9878cAdE96903607F"; // SELF VERIFIER
+    const ContractAddress = KYC_VERIFIER_CONTRACT_ADDRESS; // SELF VERIFIER
 
     if (!proof || !publicSignals) {
       return NextResponse.json(
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
     // const configuredVerifier = new SelfBackendVerifier(
     //   "self-workshop",
-    //   "https://1d89-111-235-226-130.ngrok-free.app/api/verify",
+    //   "https://pawnstars.vercel.app/api/verify",
     //   "uuid",
     //   true
     // )

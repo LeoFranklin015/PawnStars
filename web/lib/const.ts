@@ -2,7 +2,7 @@ export const GRAPH_URL =
   "https://api.studio.thegraph.com/query/73364/pawnstars/version/latest";
 
 export const KYC_VERIFIER_CONTRACT_ADDRESS =
-  "0x02DD486b283a644D1C72f83Ef5B4e4fF97f6D6BE";
+  "0x036551552e14AC7fbb0754FF1dDC5Ae64E0F1834";
 
 export const UNIVERSAL_KYC_CONTRACT_ADDRESS =
   "0x7f6345C845199C2B26f03Cc4207c25d7c5638DAC";

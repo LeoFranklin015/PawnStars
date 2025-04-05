@@ -24,7 +24,7 @@ export function handleRWATokenIssued(event: RWATokenIssuedEvent): void {
   rwa.tokenURI = event.params.tokenURI;
   rwa.status = "ISSUED";
   rwa.productName = ""; // Will be updated from Issuer event
-  rwa.productModel = ""; // Will be updated from Issuer event
+  rwa.imageHash = ""; // Will be updated from Issuer event
   rwa.yearsOfUsage = BigInt.fromI32(0); // Will be updated from Issuer event
   rwa.documentHash = ""; // Will be updated from Issuer event
   rwa.createdAt = event.block.timestamp;

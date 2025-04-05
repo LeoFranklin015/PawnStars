@@ -27,7 +27,7 @@ export function handleRWARequestCreated(event: RWARequestCreatedEvent): void {
   rwa.tokenURI = event.params.documentHash;
   rwa.status = "REQUESTED";
   rwa.productName = event.params.productName;
-  rwa.productModel = event.params.imageHash;
+  rwa.imageHash = event.params.imageHash;
   rwa.yearsOfUsage = event.params.yearsOfUsage;
   rwa.documentHash = event.params.documentHash;
   rwa.createdAt = event.block.timestamp;
@@ -44,7 +44,7 @@ export function handleRWAApproved(event: RWAApprovedEvent): void {
 
   rwa.status = "APPROVED";
   rwa.productName = event.params.productName;
-  rwa.productModel = event.params.productModel;
+  rwa.imageHash = event.params.productModel;
   rwa.documentHash = event.params.documentHash;
   rwa.lastUpdated = event.block.timestamp;
   rwa.save();

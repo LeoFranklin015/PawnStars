@@ -17,7 +17,7 @@ type RWA @entity {
   tokenURI: String!
   status: RWAStatus!
   productName: String!
-  productModel: String!
+  imageHash: String!
   yearsOfUsage: BigInt!
   documentHash: String!
   loans: [Loan!]! @derivedFrom(field: "rwa")

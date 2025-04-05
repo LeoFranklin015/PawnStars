@@ -1,19 +1,21 @@
 import { request, gql } from "graphql-request";
 import { GRAPH_URL } from "../const";
 
-export const fetchMarket = async () => {
+export const fetchRWAs = async (address: string) => {
   const query = gql`
     query MyQuery {
-      rwas {
+      rwas(
+        where: { owner_: { id: "${address}" } }
+      ) {
         createdAt
-        id
+        documentHash
         lastUpdated
+        id
+        imageHash
+        productName
         status
+        yearsOfUsage
         tokenURI
-        owner {
-          id
-          name
-        }
       }
     }
   `;

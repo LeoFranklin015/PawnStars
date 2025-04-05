@@ -46,7 +46,6 @@ export class HashKeyRWAVerifier {
     try {
       // Remove any existing listeners to prevent duplicates
       this.contract.removeAllListeners("RWARequestCreated");
-      this.contract.removeAllListeners("LoanRequested");
 
       // Set up the RWARequestCreated event listener
       this.contract.on(
@@ -71,27 +70,6 @@ export class HashKeyRWAVerifier {
           } catch (error) {
             console.error(
               `[Chain ${this.chainId}] Error processing KYC event:`,
-              error
-            );
-          }
-        }
-      );
-
-      // Set up the LoanRequested event listener
-      this.contract.on(
-        "LoanRequested",
-        async (borrower, rwaId, amount, requestId, valuation) => {
-          try {
-            await handleLoanRequested(
-              borrower,
-              rwaId,
-              amount,
-              requestId,
-              valuation
-            );
-          } catch (error) {
-            console.error(
-              `[Chain ${this.chainId}] Error processing LoanRequested event:`,
               error
             );
           }

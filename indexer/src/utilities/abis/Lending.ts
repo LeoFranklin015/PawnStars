@@ -1,4 +1,4 @@
-[
+export const LENDING_ABI = [
   {
     inputs: [
       {

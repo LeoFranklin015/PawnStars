@@ -1,16 +1,16 @@
-import { HashKeyRWAVerifier } from "./blockchain/HashKeyRWAVerifier";
+import { Validator } from "./blockchain/Validator";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const main = async () => {
-  const indexers: HashKeyRWAVerifier[] = [];
+  const indexers: Validator[] = [];
 
   try {
     const config = [
       {
         providerUrl: "wss://hashkeychain-testnet.alt.technology/ws",
-        contractAddress: "0x9262CDc7d3dE2b785231CA1Effd2d562E638d85E", // Lending Protocol
+        contractAddress: "0x5Dec92c62c804c0d248a854138A7192945f47F3d", // Lending Protocol
         chainId: 133,
       },
     ];
@@ -19,7 +19,7 @@ const main = async () => {
     await Promise.all(
       config.map(async (chain) => {
         console.log(`Starting indexer for chain ${chain.chainId}...`);
-        const indexer = new HashKeyRWAVerifier(chain);
+        const indexer = new Validator(chain);
         indexers.push(indexer);
         await indexer.startListening();
         console.log(`Indexer for chain ${chain.chainId} is now running`);

@@ -119,7 +119,7 @@ export const RequestKYC = async (
     if (true) {
       console.log("Approving RWA");
       const tx = await walletClient.writeContract({
-        address: "0x85555012BFf9D238693BA9BF7eed16523d721EF1" as `0x${string}`,
+        address: "0xefF7Bf6B003AfAaFB45C9D922db2162ca4D4A866" as `0x${string}`,
         abi: IssuerAbi,
         functionName: "approveRWA",
         args: [requestId],

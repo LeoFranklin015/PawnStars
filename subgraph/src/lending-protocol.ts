@@ -6,7 +6,7 @@ import {
   LoanRepaid as LoanRepaidEvent,
 } from "../generated/LendingProtocol/LendingProtocol";
 import { User, RWA, Loan } from "../generated/schema";
-import { BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Bytes } from "@graphprotocol/graph-ts";
 
 export function handleLoanRequested(event: LoanRequestedEvent): void {
   // Load or create User
@@ -31,8 +31,17 @@ export function handleLoanRequested(event: LoanRequestedEvent): void {
   loan.rwa = rwaId;
   loan.requestedAmount = event.params.amount;
   loan.status = "REQUESTED";
+
   loan.createdAt = event.block.timestamp;
   loan.lastUpdated = event.block.timestamp;
+
+  let rwa = RWA.load(rwaId);
+  if (rwa) {
+    rwa.status = "REQUESTED_LOAN";
+    rwa.lastUpdated = event.block.timestamp;
+    rwa.save();
+  }
+
   loan.save();
 }
 
@@ -41,6 +50,12 @@ export function handleValuationProvided(event: ValuationProvidedEvent): void {
   let loan = Loan.load(loanId);
   if (!loan) return;
 
+  let rwa = RWA.load(loan.rwa);
+  if (rwa) {
+    rwa.status = "REQUESTED_LOAN_VALIDATED";
+    rwa.lastUpdated = event.block.timestamp;
+    rwa.save();
+  }
   loan.valuation = event.params.valuation;
   loan.status = "VALUED";
   loan.lastUpdated = event.block.timestamp;

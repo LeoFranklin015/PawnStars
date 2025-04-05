@@ -1,4 +1,9 @@
-import { ethers } from "ethers";
+import { Contract, ethers } from "ethers";
+import { IssuerAbi } from "../abis/Issuer";
+import { createWalletClient, http } from "viem";
+import { hashkeyTestnet } from "viem/chains";
+import { createPublicClient } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 
 export const handleLoanRequested = async (
   borrower: string,
@@ -17,12 +22,30 @@ export const handleLoanRequested = async (
     console.log(`Valuation: ${ethers.formatEther(valuation)} ETH`);
     console.log("------------------------");
 
-    // TODO: Add any additional processing logic here
-    // For example:
-    // - Store in database
-    // - Trigger notifications
-    // - Update UI state
-    // - Call other services
+    const publicClient = createPublicClient({
+      chain: hashkeyTestnet,
+      transport: http(),
+    });
+
+    const rwa = await publicClient.readContract({
+      address: "0x5Dec92c62c804c0d248a854138A7192945f47F3d",
+      abi: IssuerAbi,
+      functionName: "getRWA",
+      args: [rwaId],
+    });
+
+    const walletClient = createWalletClient({
+      account: privateKeyToAccount(process.env.PRIVATE_KEY as `0x${string}`),
+      transport: http(),
+      chain: hashkeyTestnet,
+    });
+
+    const tx = await walletClient.writeContract({
+      address: "0x5Dec92c62c804c0d248a854138A7192945f47F3d",
+      abi: IssuerAbi,
+      functionName: "approveLoan",
+      args: [rwaId, borrower, amount],
+    });
   } catch (error) {
     console.error("Error handling LoanRequested event:", error);
     throw error;

@@ -9,6 +9,7 @@ import LendModal from "@/components/lend-modal";
 import Image from "next/image";
 import { fetchRWAs } from "@/lib/helpers/fetchRWA";
 import { useAccount } from "wagmi";
+import { PinataSDK } from "pinata";
 
 interface RWA {
   id: string;
@@ -18,6 +19,7 @@ interface RWA {
   status: string;
   documentHash: string;
   tokenURI: string;
+  imageURL: string;
   contractStatus: number;
   loans: {
     id: string;
@@ -32,6 +34,7 @@ export default function MyRWAs() {
   const [selectedRWA, setSelectedRWA] = useState<RWA | null>(null);
   const [showLendModal, setShowLendModal] = useState(false);
   const [rwas, setRWAs] = useState<RWA[]>([]);
+  const [rwasWithImages, setRWAsWithImages] = useState<RWA[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,7 +53,44 @@ export default function MyRWAs() {
     loadRWAs();
   }, [address]);
 
-  const filteredRWAs = rwas.filter((rwa) =>
+  useEffect(() => {
+    const fetchImages = async () => {
+      const updatedrwas = await Promise.all(
+        rwas.map(async (rwa) => {
+          try {
+            const pinata = new PinataSDK({
+              pinataJwt:
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJlOTJkMDk2Ni1lZjI3LTQ2NzEtYWM2ZS0zZTE1N2M4ODFkNjYiLCJlbWFpbCI6ImNvY2xlbzE1QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiI5ZTY0YTQ5NjZmYWI2NWJjOWQwZSIsInNjb3BlZEtleVNlY3JldCI6IjEyMWViNjQ1ZjBjNzYxNmJhMWZlYzE2MDdhODdhY2EyM2NiZDg2MTE4YTMzMjQ1NTg4MmExMWVlZDc0ZDM4MGMiLCJleHAiOjE3NzUzNTgxNTF9.wSV-uVK6VVXBB0fADd53QKL5ZuWJa0Cdi6VfevN3vfY",
+              pinataGateway: "orange-select-opossum-767.mypinata.cloud",
+            });
+            if (!rwa.imageHash) {
+              return { ...rwa, imageURL: "/placeholder.svg" };
+            }
+
+            const { data: imageURL, contentType } =
+              await pinata.gateways.private.get(rwa.imageHash);
+            console.log(imageURL);
+            const blobUrl = URL.createObjectURL(
+              new Blob([imageURL as Blob], { type: contentType || "image/png" })
+            );
+
+            return { ...rwa, imageURL: blobUrl || "/placeholder.svg" };
+          } catch (error) {
+            console.error(`Failed to fetch image for rwa ${rwa.id}:`, error);
+            return { ...rwa, imageURL: "/placeholder.svg" };
+          }
+        })
+      );
+      console.log(updatedrwas);
+      setRWAsWithImages(updatedrwas);
+    };
+
+    if (rwas.length > 0) {
+      fetchImages();
+    }
+  }, [rwas]);
+
+  const filteredRWAs = rwasWithImages.filter((rwa) =>
     rwa.productName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -218,7 +258,7 @@ export default function MyRWAs() {
                   <Link href={`/rwa/${rwa.id}`}>
                     <div className="relative h-48 overflow-hidden">
                       <Image
-                        src={getImageUrl(rwa)}
+                        src={rwa.imageURL}
                         alt={rwa.productName}
                         width={600}
                         height={400}

@@ -87,4 +87,7 @@ contract Issuer {
         return 0;
     }
 
+    function getRWA(uint256 tokenId) external view returns (string memory productName, string memory imageHash, uint256 yearsOfUsage, string memory documentHash) {
+        return (rwaRequests[tokenId].productName, rwaRequests[tokenId].imageHash, rwaRequests[tokenId].yearsOfUsage, rwaRequests[tokenId].documentHash);
+    }
 }

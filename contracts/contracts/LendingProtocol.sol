@@ -68,7 +68,7 @@ contract LendingProtocol is Ownable {
 
         rwaStatus[_rwaId] = 0;
         
-        emit LoanRequested(msg.sender, _rwaId, 0, loanRequestCounter, 0);
+        emit LoanRequested(msg.sender, _rwaId+1, 0, loanRequestCounter, 0);
         loanRequestCounter++;
     }
     
@@ -80,7 +80,7 @@ contract LendingProtocol is Ownable {
         for (uint256 i = 0; i < loanRequestCounter; i++) {
             if (loanRequests[i].rwaId == _rwaId && loanRequests[i].isActive && !loanRequests[i].isFilled) {
                 loanRequests[i].valuation = _valuation;
-                emit ValuationProvided(_rwaId, i, _valuation);
+                emit ValuationProvided(_rwaId+1, i, _valuation);
                 return;
             }
         }
@@ -107,7 +107,7 @@ contract LendingProtocol is Ownable {
         // Mark request as accepted
         request.isAccepted = true;
         rwaStatus[request.rwaId] = 2;
-        emit LoanAccepted(_requestId, msg.sender, request.rwaId, maxLoanAmount, request.valuation);
+        emit LoanAccepted(_requestId, msg.sender, request.rwaId+1, maxLoanAmount, request.valuation);
     }
     
     // Function to issue a loan after acceptance
@@ -134,7 +134,7 @@ contract LendingProtocol is Ownable {
         // Transfer USDC to borrower
         require(usdcToken.transfer(request.borrower, request.valuation), "USDC transfer failed");
         rwaStatus[request.rwaId] = 3;
-        emit LoanIssued(loanCounter, request.borrower, request.rwaId, request.valuation, 500, block.timestamp + 365 days);
+        emit LoanIssued(loanCounter, request.borrower, request.rwaId +1, request.valuation, 500, block.timestamp + 365 days);
         loanCounter++;
     }
     
@@ -159,7 +159,7 @@ contract LendingProtocol is Ownable {
         // Mark loan as inactive
         loan.isActive = false;
         rwaStatus[loan.rwaId] = 4;
-        emit LoanRepaid(_loanId, msg.sender, loan.rwaId, loan.amount, interest);
+        emit LoanRepaid(_loanId, msg.sender, loan.rwaId +1, loan.amount, interest);
     }
     
     // Function to get loan details

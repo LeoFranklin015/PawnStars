@@ -1,5 +1,12 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Button } from "@/components/ui/button";
+import { User } from "lucide-react";
+import { useState } from "react";
+import ProfileModal from "./ProfileModal";
+
 export const CustomConnectButton = () => {
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
   return (
     <ConnectButton.Custom>
       {({
@@ -33,24 +40,37 @@ export const CustomConnectButton = () => {
             {(() => {
               if (!connected) {
                 return (
-                  <button onClick={openConnectModal} type="button">
+                  <Button
+                    onClick={openConnectModal}
+                    type="button"
+                    className="border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0)]"
+                  >
                     Connect Wallet
-                  </button>
+                  </Button>
                 );
               }
               if (chain.unsupported) {
                 return (
-                  <button onClick={openChainModal} type="button">
+                  <Button
+                    onClick={openChainModal}
+                    type="button"
+                    variant="destructive"
+                    className="border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0)]"
+                  >
                     Wrong network
-                  </button>
+                  </Button>
                 );
               }
               return (
-                <div style={{ display: "flex", gap: 12 }}>
-                  <button
+                <div
+                  style={{ display: "flex", gap: 12 }}
+                  className="items-center"
+                >
+                  <Button
                     onClick={openChainModal}
-                    style={{ display: "flex", alignItems: "center" }}
                     type="button"
+                    variant="outline"
+                    className="border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0)] flex items-center"
                   >
                     {chain.hasIcon && (
                       <div
@@ -73,16 +93,31 @@ export const CustomConnectButton = () => {
                       </div>
                     )}
                     {chain.name}
-                  </button>
-                  <button onClick={openAccountModal} type="button">
-                    {account.displayName}
-                    {account.displayBalance
-                      ? ` (${account.displayBalance})`
-                      : ""}
-                  </button>
+                  </Button>
+                  <div className="relative">
+                    <Button
+                      onClick={() => setShowProfileModal(true)}
+                      type="button"
+                      variant="outline"
+                      className="border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0)] p-2"
+                      size="icon"
+                    >
+                      <div className="relative">
+                        <User className="h-5 w-5" />
+                        <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white" />
+                      </div>
+                    </Button>
+                  </div>
                 </div>
               );
             })()}
+            {showProfileModal && connected && (
+              <ProfileModal
+                onClose={() => setShowProfileModal(false)}
+                account={account}
+                onDisconnect={openAccountModal}
+              />
+            )}
           </div>
         );
       }}

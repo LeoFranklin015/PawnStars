@@ -2,51 +2,60 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import Navbar from "@/components/navbar";
-import VerificationModal from "@/components/verification-modal";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUserStore } from "@/lib/stores/user-store";
 import { CheckCircle2, FileCheck, Coins, ArrowRight } from "lucide-react";
 
 export default function Home() {
-  const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const { user, isLoggedIn } = useUserStore();
-
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar onVerify={() => setShowVerificationModal(false)} />
-
       {/* Hero Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-24 bg-white">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="space-y-8"
-            >
-              <h1
-                className="text-6xl md:text-7xl font-black"
-                style={{ textShadow: "4px 4px 0px #FFD700" }}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl mx-auto text-center space-y-12"
+          >
+            <div className="relative inline-block">
+              <motion.h1
+                className="text-5xl md:text-6xl font-black tracking-tighter"
+                style={{
+                  background: "linear-gradient(45deg, #000000, #333333)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  textShadow: "6px 6px 0px #FFD700",
+                  letterSpacing: "-0.05em",
+                }}
               >
-                PAWNSTARS
-              </h1>
+                PAWN
+              </motion.h1>
+              <motion.h1
+                className="text-8xl md:text-9xl font-black tracking-tighter"
+                style={{
+                  background: "linear-gradient(45deg, #000000, #333333)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  textShadow: "6px 6px 0px #FFD700",
+                  letterSpacing: "-0.05em",
+                }}
+              >
+                STARS
+              </motion.h1>
+            </div>
 
-              <h2 className="text-3xl font-bold">
-                Turn Your Valuables Into RWA's
-              </h2>
-
-              <p className="text-lg text-gray-600">
+            <div className="space-y-6">
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                 Hold the proof of asset and lend the asset to get some cash
-                whenever needed !
+                whenever needed!
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
                   size="lg"
-                  className="font-bold text-base border-2 border-black"
+                  className="font-bold text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0)]"
                 >
                   <Link href="/create-rwa">Get Started</Link>
                 </Button>
@@ -54,59 +63,13 @@ export default function Home() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="font-bold text-base border-2 border-black"
+                  className="font-bold text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0)]"
                 >
                   <Link href="/my-rwas">View My Assets</Link>
                 </Button>
               </div>
-
-              <div className="flex items-center gap-4">
-                <div className="flex -space-x-3">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className="h-10 w-10 rounded-full border-2 border-black bg-green-200 flex items-center justify-center"
-                    >
-                      <span className="text-xs font-bold">U{i}</span>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-sm text-gray-600">
-                  <span className="font-bold text-black">People</span> started
-                  to bring thier Real World Assets onchain
-                </p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative"
-            >
-              <div className="border-2 border-black rounded-xl overflow-hidden bg-green-100 p-8">
-                <img
-                  src="/placeholder.svg?height=400&width=600"
-                  alt="Luxury items collage"
-                  className="w-full h-auto rounded-lg border-2 border-black mb-6"
-                />
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="bg-white p-4 rounded-lg border-2 border-black">
-                    <div className="text-sm font-bold mb-1">
-                      Estimated Value
-                    </div>
-                    <div className="text-2xl font-black">$12,500</div>
-                  </div>
-                  <div className="bg-white p-4 rounded-lg border-2 border-black">
-                    <div className="text-sm font-bold mb-1">Available Cash</div>
-                    <div className="text-2xl font-black text-primary">
-                      $7,500
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -245,10 +208,6 @@ export default function Home() {
           </Button>
         </div>
       </section>
-
-      {showVerificationModal && (
-        <VerificationModal onClose={() => setShowVerificationModal(false)} />
-      )}
     </div>
   );
 }

@@ -33,7 +33,7 @@ export const KYCVerified = async (
     });
 
     const tx = await walletClient.writeContract({
-      address: "0xB35867517ce0D65Db253B8b9878cAdE96903607F",
+      address: "0x5A47902ceb0AEbF11D18df3b88209E735Deb708C",
       abi: UniversalKYCAbi,
       functionName: "verifyUser",
       args: [

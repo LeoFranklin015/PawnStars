@@ -4,7 +4,7 @@ import { countries, getUniversalLink } from "@selfxyz/core";
 import SelfQRcodeWrapper, { SelfAppBuilder } from "@selfxyz/qrcode";
 import { v4 } from "uuid";
 
-export default function Home() {
+export default function Self() {
   const userId = v4();
   const address = "0x4b4b30e2E7c6463b03CdFFD6c42329D357205334";
 
@@ -28,7 +28,7 @@ export default function Home() {
   console.log("Universal link:", getUniversalLink(selfApp));
 
   return (
-    <div className="h-screen w-full bg-white flex flex-col items-center justify-center gap-4">
+    <div className="w-full bg-white flex flex-col items-center justify-center gap-4">
       <SelfQRcodeWrapper
         selfApp={selfApp}
         // type='deeplink'
@@ -36,14 +36,6 @@ export default function Home() {
           console.log("Verification successful");
         }}
       />
-      <button
-        onClick={() => {
-          window.alert(getUniversalLink(selfApp));
-        }}
-        className="mt-4 bg-black text-white p-2 px-3 rounded-md"
-      >
-        Open Self app
-      </button>
     </div>
   );
 }

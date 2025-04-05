@@ -42,8 +42,10 @@
 
 .dotted-background {
   background-color: hsl(var(--bg-color));
-  background-image: radial-gradient(hsl(var(--dot-color)) var(--dot-size), transparent var(--dot-size));
+  background-image: radial-gradient(
+    hsl(var(--dot-color)) var(--dot-size),
+    transparent var(--dot-size)
+  );
   background-size: var(--dot-space) var(--dot-space);
   background-position: center center;
 }
-

@@ -35,12 +35,12 @@ export default function Home() {
               </h1>
 
               <h2 className="text-3xl font-bold">
-                Turn Your Valuables Into Instant Cash
+                Turn Your Valuables Into RWA's
               </h2>
 
               <p className="text-lg text-gray-600">
-                Get the cash you need without selling your valuable items. Fast,
-                secure, and hassle-free.
+                Hold the proof of asset and lend the asset to get some cash
+                whenever needed !
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">

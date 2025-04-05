@@ -24,8 +24,8 @@ contract Issuer {
 
     mapping(uint256 => RWARequest) public rwaRequests;
 
-    event RWARequestCreated(uint256 requestId, address requester , uint256 yearsOfUsage , string productName , string productModel , string documentHash);
-    event RWAApproved(uint256 requestId);
+    event RWARequestCreated(uint256 indexed requestId, address indexed requester, uint256 yearsOfUsage, string productName, string productModel, string documentHash);
+    event RWAApproved(uint256 indexed requestId, address indexed requester, string productName, string productModel, string documentHash);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only the owner can perform this action");
@@ -70,7 +70,7 @@ contract Issuer {
         rwaRequest.isIssued = true;
         rwaContract.mintRWA(rwaRequest.requester, rwaRequest.documentHash);
 
-        emit RWAApproved(requestId);
+        emit RWAApproved(requestId, rwaRequest.requester, rwaRequest.productName, rwaRequest.productModel, rwaRequest.documentHash);
 
     }
 

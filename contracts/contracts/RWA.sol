@@ -8,7 +8,7 @@ contract RWA is ERC721URIStorage, Ownable {
     uint256 public tokenIdCounter;
     address private issuer;
 
-    event RWATokenIssued(uint256 tokenId, address owner);
+    event RWATokenIssued(uint256 indexed tokenId, address indexed owner, string tokenURI);
 
     // Constructor to set the name and symbol for the ERC721 token
     constructor() ERC721("RealWorldAsset", "RWA") Ownable(msg.sender) {}
@@ -32,7 +32,7 @@ contract RWA is ERC721URIStorage, Ownable {
 
         tokenIdCounter++;
 
-        emit RWATokenIssued(tokenId, recipient);
+        emit RWATokenIssued(tokenId, recipient, _tokenURI);
         return tokenId;
     }
 }

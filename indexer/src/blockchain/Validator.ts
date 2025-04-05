@@ -1,7 +1,6 @@
 import { Contract, JsonRpcProvider, WebSocketProvider } from "ethers";
 import { IssuerAbi } from "../utilities/abis/Issuer";
 import { RequestKYC } from "../utilities/EventHandlers/RequestKYCHandler";
-import { handleLoanRequested } from "../utilities/EventHandlers/LoanRequestedHandler";
 // Contract ABI
 const contractABI = IssuerAbi;
 interface ChainConfig {
@@ -46,9 +45,8 @@ export class HashKeyRWAVerifier {
     try {
       // Remove any existing listeners to prevent duplicates
       this.contract.removeAllListeners("RWARequestCreated");
-      this.contract.removeAllListeners("LoanRequested");
 
-      // Set up the RWARequestCreated event listener
+      // Set up the event listener
       this.contract.on(
         "RWARequestCreated",
         async (
@@ -77,27 +75,6 @@ export class HashKeyRWAVerifier {
         }
       );
 
-      // Set up the LoanRequested event listener
-      this.contract.on(
-        "LoanRequested",
-        async (borrower, rwaId, amount, requestId, valuation) => {
-          try {
-            await handleLoanRequested(
-              borrower,
-              rwaId,
-              amount,
-              requestId,
-              valuation
-            );
-          } catch (error) {
-            console.error(
-              `[Chain ${this.chainId}] Error processing LoanRequested event:`,
-              error
-            );
-          }
-        }
-      );
-
       // Set up provider error handling
       this.provider.on("error", this.handleProviderError.bind(this));
 
@@ -105,12 +82,10 @@ export class HashKeyRWAVerifier {
       this.reconnectAttempts = 0;
       this._isListening = true;
 
-      console.log(
-        `[Chain ${this.chainId}] Successfully set up event listeners`
-      );
+      console.log(`[Chain ${this.chainId}] Successfully set up event listener`);
     } catch (error) {
       console.error(
-        `[Chain ${this.chainId}] Error setting up event listeners:`,
+        `[Chain ${this.chainId}] Error setting up event listener:`,
         error
       );
       await this.handleProviderError(
@@ -184,7 +159,6 @@ export class HashKeyRWAVerifier {
 
     try {
       this.contract.removeAllListeners("RWARequestCreated");
-      this.contract.removeAllListeners("LoanRequested");
       this.provider.removeAllListeners();
       this._isListening = false;
       console.log(`[Chain ${this.chainId}] Stopped listening for events`);

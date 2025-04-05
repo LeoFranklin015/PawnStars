@@ -44,7 +44,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
 
   const getImageUrl = (rwa: RWA) => {
     if (rwa.imageHash && rwa.imageHash !== "") {
-      return `https://ipfs.io/ipfs/${rwa.imageHash}`;
+      return `/placeholder.svg?height=400&width=600`;
     }
     return "/placeholder.svg?height=400&width=600";
   };

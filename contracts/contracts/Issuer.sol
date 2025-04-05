@@ -74,4 +74,17 @@ contract Issuer {
 
     }
 
+    function getRWAStatus(uint256 requestId) external view returns (uint256) {
+        if(rwaRequests[requestId].isApproved && rwaRequests[requestId].isIssued) {
+            return 1;
+        }
+        else if(rwaRequests[requestId].isApproved && !rwaRequests[requestId].isIssued) {
+            return 2;
+        }
+        else if(!rwaRequests[requestId].isApproved && rwaRequests[requestId].isIssued) {
+            return 3;
+        }
+        return 0;
+    }
+
 }

@@ -18,6 +18,7 @@ interface RWA {
   status: string;
   documentHash: string;
   tokenURI: string;
+  contractStatus: number;
   loans: {
     id: string;
     status: string;
@@ -72,7 +73,61 @@ export default function MyRWAs() {
         return "lending";
       }
     }
-    return "available";
+
+    switch (rwa.contractStatus) {
+      case 0:
+        return "requested";
+      case 1:
+        return "valued";
+      case 2:
+        return "accepted";
+      case 3:
+        return "issued";
+      case 4:
+        return "repaid";
+      default:
+        return "unknown";
+    }
+  };
+
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case "lending":
+        return {
+          text: "In Lending",
+          classes: "bg-blue-100 text-blue-800 border-2 border-blue-500",
+        };
+      case "requested":
+        return {
+          text: "Loan Requested",
+          classes: "bg-yellow-100 text-yellow-800 border-2 border-yellow-500",
+        };
+      case "valued":
+        return {
+          text: "Valuation Done",
+          classes: "bg-purple-100 text-purple-800 border-2 border-purple-500",
+        };
+      case "accepted":
+        return {
+          text: "Loan Accepted",
+          classes: "bg-green-100 text-green-800 border-2 border-green-500",
+        };
+      case "issued":
+        return {
+          text: "Loan Issued",
+          classes: "bg-blue-100 text-blue-800 border-2 border-blue-500",
+        };
+      case "repaid":
+        return {
+          text: "Loan Repaid",
+          classes: "bg-gray-100 text-gray-800 border-2 border-gray-500",
+        };
+      default:
+        return {
+          text: "Unknown",
+          classes: "bg-gray-100 text-gray-800 border-2 border-gray-500",
+        };
+    }
   };
 
   if (!address) {
@@ -172,12 +227,10 @@ export default function MyRWAs() {
                       <div className="absolute top-2 right-2">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            status === "available"
-                              ? "bg-green-100 text-green-800 border-2 border-green-500"
-                              : "bg-blue-100 text-blue-800 border-2 border-blue-500"
+                            getStatusDisplay(status).classes
                           }`}
                         >
-                          {status === "available" ? "Available" : "In Lending"}
+                          {getStatusDisplay(status).text}
                         </span>
                       </div>
                     </div>
@@ -200,7 +253,7 @@ export default function MyRWAs() {
                       </div>
                     </div>
 
-                    {status === "available" ? (
+                    {status === "valued" ? (
                       <Button
                         onClick={(e) => {
                           e.preventDefault();
@@ -208,7 +261,7 @@ export default function MyRWAs() {
                         }}
                         className="w-full border-2 border-black"
                       >
-                        Lend Asset
+                        Accept Loan
                       </Button>
                     ) : (
                       <Button

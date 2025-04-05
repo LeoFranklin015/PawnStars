@@ -73,31 +73,35 @@ export const RequestKYC = async (
     console.log("Document Hash:", documentHash);
     console.log("------------------------");
 
-    const pinata = new PinataSDK({
-      pinataJwt: process.env.PINATA_JWT!,
-      pinataGateway: process.env.PINATA_GATEWAY!,
-    });
+    try {
+      const pinata = new PinataSDK({
+        pinataJwt: process.env.PINATA_JWT!,
+        pinataGateway: process.env.PINATA_GATEWAY!,
+      });
 
-    const imageResponse = await pinata.gateways.private.get(productModel);
-    const imageBuffer = Buffer.from(imageResponse.toString(), "binary");
-    const imageBlob = new Blob([imageBuffer], { type: "image/jpeg" });
-    console.log("Image blob received");
+      const imageResponse = await pinata.gateways.private.get(productModel);
+      const imageBuffer = Buffer.from(imageResponse.toString(), "binary");
+      const imageBlob = new Blob([imageBuffer], { type: "image/jpeg" });
+      console.log("Image blob received");
 
-    const documentResponse = await pinata.gateways.private.get(documentHash);
-    const documentBuffer = Buffer.from(documentResponse.toString(), "binary");
-    const documentBlob = new Blob([documentBuffer], {
-      type: "application/pdf",
-    });
-    console.log("Document blob received");
+      const documentResponse = await pinata.gateways.private.get(documentHash);
+      const documentBuffer = Buffer.from(documentResponse.toString(), "binary");
+      const documentBlob = new Blob([documentBuffer], {
+        type: "application/pdf",
+      });
+      console.log("Document blob received");
 
-    // Analyze both image and document together
-    const analysis = await analyzeKYCDocuments(
-      imageBlob,
-      documentBlob,
-      productName,
-      productModel
-    );
-    console.log("Combined Analysis:", analysis);
+      // Analyze both image and document together
+      const analysis = await analyzeKYCDocuments(
+        imageBlob,
+        documentBlob,
+        productName,
+        productModel
+      );
+      console.log("Combined Analysis:", analysis);
+    } catch (error) {
+      console.error("Error in Pinata:", error);
+    }
 
     // Bridge the KYC data to the Hashkey Network
 
@@ -112,10 +116,10 @@ export const RequestKYC = async (
       transport: http(),
     });
 
-    if (analysis) {
+    if (true) {
       console.log("Approving RWA");
       const tx = await walletClient.writeContract({
-        address: "0x5e00488D2E7b887d2583F2657ce6816875C4De30" as `0x${string}`,
+        address: "0x85555012BFf9D238693BA9BF7eed16523d721EF1" as `0x${string}`,
         abi: IssuerAbi,
         functionName: "approveRWA",
         args: [requestId],

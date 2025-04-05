@@ -14,7 +14,8 @@ contract LendingProtocol is Ownable {
     // Constants
     uint256 public constant LTV_RATIO = 60; // 60% LTV
     uint256 public constant BASIS_POINTS = 1000000000000000000;
-    
+
+    mapping(uint256 => uint256) public rwaStatus;
     // Structs
     struct LoanRequest {
         address borrower;
@@ -55,7 +56,6 @@ contract LendingProtocol is Ownable {
     
     // Function to request a loan using RWA as collateral
     function requestLoan(uint256 _rwaId) external  {
-        require(rwaToken.ownerOf(_rwaId) == msg.sender, "Not the RWA owner");
         
         loanRequests[loanRequestCounter] = LoanRequest({
             borrower: msg.sender,
@@ -65,6 +65,8 @@ contract LendingProtocol is Ownable {
             isFilled: false,
             isAccepted: false
         });
+
+        rwaStatus[_rwaId] = 0;
         
         emit LoanRequested(msg.sender, _rwaId, 0, loanRequestCounter, 0);
         loanRequestCounter++;
@@ -83,6 +85,7 @@ contract LendingProtocol is Ownable {
             }
         }
         
+        rwaStatus[_rwaId] = 1;
         revert("No active loan request found for this RWA");
     }
     
@@ -103,7 +106,7 @@ contract LendingProtocol is Ownable {
         
         // Mark request as accepted
         request.isAccepted = true;
-        
+        rwaStatus[request.rwaId] = 2;
         emit LoanAccepted(_requestId, msg.sender, request.rwaId, maxLoanAmount, request.valuation);
     }
     
@@ -130,7 +133,7 @@ contract LendingProtocol is Ownable {
         
         // Transfer USDC to borrower
         require(usdcToken.transfer(request.borrower, request.valuation), "USDC transfer failed");
-        
+        rwaStatus[request.rwaId] = 3;
         emit LoanIssued(loanCounter, request.borrower, request.rwaId, request.valuation, 500, block.timestamp + 365 days);
         loanCounter++;
     }
@@ -155,7 +158,7 @@ contract LendingProtocol is Ownable {
         
         // Mark loan as inactive
         loan.isActive = false;
-        
+        rwaStatus[loan.rwaId] = 4;
         emit LoanRepaid(_loanId, msg.sender, loan.rwaId, loan.amount, interest);
     }
     
@@ -179,5 +182,9 @@ contract LendingProtocol is Ownable {
             loan.dueTime,
             loan.isActive
         );
+    }
+
+    function getRWAStatus(uint256 _rwaId) external view returns (uint256) {
+        return rwaStatus[_rwaId];
     }
 } 

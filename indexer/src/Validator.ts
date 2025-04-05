@@ -10,7 +10,7 @@ const main = async () => {
     const config = [
       {
         providerUrl: "wss://hashkeychain-testnet.alt.technology/ws",
-        contractAddress: "0x85555012BFf9D238693BA9BF7eed16523d721EF1", // Issuer
+        contractAddress: "0x9262CDc7d3dE2b785231CA1Effd2d562E638d85E", // Lending Protocol
         chainId: 133,
       },
     ];

@@ -1,8 +1,4 @@
-import {
-  countries,
-  getUserIdentifier,
-  SelfBackendVerifier,
-} from "@selfxyz/core";
+import { getUserIdentifier } from "@selfxyz/core";
 import { NextResponse } from "next/server";
 import { ethers } from "ethers";
 
@@ -10,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { proof, publicSignals } = body;
-    const ContractAddress = "0xB35867517ce0D65Db253B8b9878cAdE96903607F";
+    const ContractAddress = "0xB35867517ce0D65Db253B8b9878cAdE96903607F"; // SELF VERIFIER
 
     if (!proof || !publicSignals) {
       return NextResponse.json(
@@ -230,10 +226,7 @@ export async function POST(request: Request) {
     const provider = new ethers.JsonRpcProvider(
       "https://alfajores-forno.celo-testnet.org"
     );
-    const signer = new ethers.Wallet(
-      "0x6bec59d4979fdaaf7f4b7174b84332246fb89e42b159e930bf7ea2351483b5a0",
-      provider
-    );
+    const signer = new ethers.Wallet(process.env.PRIVATE_KEY || "", provider);
     const contract = new ethers.Contract(ContractAddress, abi, signer);
     console.log("proof", proof);
     console.log("publicSignals", publicSignals);

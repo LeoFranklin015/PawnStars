@@ -2,11 +2,10 @@
 
 import { countries, getUniversalLink } from "@selfxyz/core";
 import SelfQRcodeWrapper, { SelfAppBuilder } from "@selfxyz/qrcode";
-import { v4 } from "uuid";
+import { useAccount } from "wagmi";
 
 export default function Self() {
-  const userId = v4();
-  const address = "0x4b4b30e2E7c6463b03CdFFD6c42329D357205334";
+  const { address } = useAccount();
 
   const selfApp = new SelfAppBuilder({
     appName: "Self Workshop",

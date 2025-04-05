@@ -16,7 +16,9 @@ import { publicClient, walletClient } from "@/lib/client";
 import { ISSUER_ABI, ISSUER_CONTRACT_ADDRESS } from "@/lib/const";
 import { useAccount } from "wagmi";
 import { ethers } from "ethers";
+import Image from "next/image";
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export default function CreateRWA() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -244,9 +246,11 @@ export default function CreateRWA() {
                   >
                     {imagePreview ? (
                       <div className="flex flex-col items-center">
-                        <img
+                        <Image
                           src={imagePreview || "/placeholder.svg"}
                           alt="Product preview"
+                          width={400}
+                          height={400}
                           className="max-h-48 max-w-full object-contain mb-4"
                         />
                         <span className="text-sm font-bold">Change image</span>

@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X, CheckCircle2 } from "lucide-react";
-import { useUserStore } from "@/lib/stores/user-store";
+import { Menu, X } from "lucide-react";
 import { CustomConnectButton } from "./ConnectButton";
 import { useAccount } from "wagmi";
 
@@ -12,9 +11,9 @@ interface NavbarProps {
   onVerify: () => void;
 }
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export default function Navbar({ onVerify }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, isLoggedIn, logout } = useUserStore();
   const { address } = useAccount();
 
   const navLinks = [

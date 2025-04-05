@@ -1,5 +1,4 @@
 import { createWalletClient, custom, http, createPublicClient } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
 import { hashkeyTestnet } from "viem/chains";
 
 export const client = createWalletClient({

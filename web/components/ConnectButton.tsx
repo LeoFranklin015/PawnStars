@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
 import { useState } from "react";
 import ProfileModal from "./ProfileModal";
+import Image from "next/image";
 
 export const CustomConnectButton = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -84,10 +85,12 @@ export const CustomConnectButton = () => {
                         }}
                       >
                         {chain.iconUrl && (
-                          <img
+                          <Image
                             alt={chain.name ?? "Chain icon"}
                             src={chain.iconUrl}
-                            style={{ width: 12, height: 12 }}
+                            width={12}
+                            height={12}
+                            className="w-full h-full"
                           />
                         )}
                       </div>

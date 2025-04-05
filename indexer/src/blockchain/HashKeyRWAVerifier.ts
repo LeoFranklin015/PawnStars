@@ -1,6 +1,7 @@
 import { Contract, JsonRpcProvider, WebSocketProvider } from "ethers";
 import { IssuerAbi } from "../utilities/abis/Issuer";
 import { RequestKYC } from "../utilities/EventHandlers/RequestKYCHandler";
+import { handleLoanRequested } from "../utilities/EventHandlers/LoanRequestedHandler";
 // Contract ABI
 const contractABI = IssuerAbi;
 interface ChainConfig {
@@ -45,6 +46,7 @@ export class HashKeyRWAVerifier {
     try {
       // Remove any existing listeners to prevent duplicates
       this.contract.removeAllListeners("RWARequestCreated");
+      this.contract.removeAllListeners("LoanRequested");
       console.log(
         `[Chain ${this.chainId}] Setting up event listeners for contract at ${this.config.contractAddress}`
       );
@@ -84,6 +86,38 @@ export class HashKeyRWAVerifier {
           } catch (error) {
             console.error(
               `[Chain ${this.chainId}] Error processing KYC event:`,
+              error
+            );
+          }
+        }
+      );
+
+      // Set up the LoanRequested event listener
+      this.contract.on(
+        "LoanRequested",
+        async (borrower, rwaId, amount, requestId, valuation) => {
+          try {
+            console.log(
+              `[Chain ${this.chainId}] LoanRequested event received:`,
+              {
+                borrower,
+                rwaId: rwaId.toString(),
+                amount: amount.toString(),
+                requestId: requestId.toString(),
+                valuation: valuation.toString(),
+              }
+            );
+
+            await handleLoanRequested(
+              borrower,
+              rwaId,
+              amount,
+              requestId,
+              valuation
+            );
+          } catch (error) {
+            console.error(
+              `[Chain ${this.chainId}] Error processing LoanRequested event:`,
               error
             );
           }

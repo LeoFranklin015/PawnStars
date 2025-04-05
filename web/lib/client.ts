@@ -1,21 +1,17 @@
 import { createWalletClient, custom, http, createPublicClient } from "viem";
 import { hashkeyTestnet } from "viem/chains";
 
-export const client = createWalletClient({
+// Safely create public client
+export const publicClient = createPublicClient({
   chain: hashkeyTestnet,
   transport: http(),
 });
 
 // Safely create wallet client only in browser environment
 export const walletClient =
-  typeof window !== "undefined"
+  typeof window !== "undefined" && window.ethereum
     ? createWalletClient({
         chain: hashkeyTestnet,
         transport: custom(window.ethereum),
       })
     : null;
-
-export const publicClient = createPublicClient({
-  chain: hashkeyTestnet,
-  transport: http(),
-});

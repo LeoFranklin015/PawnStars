@@ -15,7 +15,7 @@ contract Issuer {
     struct RWARequest {
         address requester;  // Who is requesting the RWA token
         string productName;
-        string productModel;
+        string imageHash;
         uint256 yearsOfUsage;
         bool isApproved;
         bool isIssued;
@@ -24,7 +24,7 @@ contract Issuer {
 
     mapping(uint256 => RWARequest) public rwaRequests;
 
-    event RWARequestCreated(uint256 indexed requestId, address indexed requester, uint256 yearsOfUsage, string productName, string productModel, string documentHash);
+    event RWARequestCreated(uint256 indexed requestId, address indexed requester, uint256 yearsOfUsage, string productName, string imageHash, string documentHash);
     event RWAApproved(uint256 indexed requestId, address indexed requester, string productName, string productModel, string documentHash);
 
     modifier onlyOwner() {
@@ -45,19 +45,19 @@ contract Issuer {
     }
 
     // Function to allow users to request RWA creation
-    function requestRWA(string memory _productName , string memory _productModel, uint256 _yearsOfUsage , string memory _documentHash) external onlyKYCVerified {
+    function requestRWA(string memory _productName , string memory _imageHash, uint256 _yearsOfUsage , string memory _documentHash) external onlyKYCVerified {
         requestCounter++;
         rwaRequests[requestCounter] = RWARequest({
             requester: msg.sender,
             productName: _productName,
-            productModel: _productModel,
+            imageHash: _imageHash,
             yearsOfUsage: _yearsOfUsage,
             isApproved: false,
             isIssued: false,
             documentHash:_documentHash
         });
 
-        emit RWARequestCreated(requestCounter, msg.sender , _yearsOfUsage , _productName , _productModel , _documentHash);
+        emit RWARequestCreated(requestCounter, msg.sender , _yearsOfUsage , _productName , _imageHash , _documentHash);
     }
 
     // Function for the owner to approve the RWA request and set the price
@@ -70,7 +70,7 @@ contract Issuer {
         rwaRequest.isIssued = true;
         rwaContract.mintRWA(rwaRequest.requester, rwaRequest.documentHash);
 
-        emit RWAApproved(requestId, rwaRequest.requester, rwaRequest.productName, rwaRequest.productModel, rwaRequest.documentHash);
+        emit RWAApproved(requestId, rwaRequest.requester, rwaRequest.productName, rwaRequest.imageHash, rwaRequest.documentHash);
 
     }
 

@@ -8,6 +8,15 @@ import { useRouter } from "next/navigation";
 import LendModal from "@/components/lend-modal";
 import Image from "next/image";
 import { fetchSingleRWA } from "@/lib/helpers/fetchSingleRWA";
+import { publicClient, walletClient } from "@/lib/client";
+import {
+  LENDING_PROTOCOL_CONTRACT_ADDRESS,
+  LendingProtocolABI,
+  RWA_ABI,
+  RWA_CONTRACT_ADDRESS,
+} from "@/lib/const";
+import { useAccount } from "wagmi";
+import { erc20Abi, erc721Abi } from "viem";
 
 export default function RWADetails({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -16,6 +25,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
   const [showLendModal, setShowLendModal] = useState(false);
   const [isAcceptingOffer, setIsAcceptingOffer] = useState(false);
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
+  const { address } = useAccount();
 
   useEffect(() => {
     const loadRWA = async () => {
@@ -32,14 +42,41 @@ export default function RWADetails({ params }: { params: { id: string } }) {
     loadRWA();
   }, [params.id]);
 
-  const handleAcceptOffer = () => {
+  const handleAcceptOffer = async () => {
     setIsAcceptingOffer(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsAcceptingOffer(false);
-      setIsOfferAccepted(true);
-    }, 1500);
+    const id = parseInt(params.id) - 1;
+
+    const rwaApproval = await walletClient?.writeContract({
+      address: RWA_CONTRACT_ADDRESS,
+      abi: RWA_ABI,
+      functionName: "approve",
+      args: [LENDING_PROTOCOL_CONTRACT_ADDRESS, BigInt(id)],
+      account: address as `0x${string}`,
+    });
+
+    await publicClient.waitForTransactionReceipt({
+      hash: rwaApproval as `0x${string}`,
+    });
+
+    console.log("rwaApproval", rwaApproval);
+
+    const tx = await walletClient?.writeContract({
+      address: LENDING_PROTOCOL_CONTRACT_ADDRESS,
+      abi: LendingProtocolABI,
+      functionName: "acceptLoan",
+      args: [BigInt(id)],
+      account: address as `0x${string}`,
+    });
+
+    await publicClient.waitForTransactionReceipt({
+      hash: tx as `0x${string}`,
+    });
+
+    console.log("tx", tx);
+
+    setIsAcceptingOffer(false);
+    setIsOfferAccepted(true);
   };
 
   const getImageUrl = (rwa: any) => {
@@ -160,7 +197,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                       Estimated Value
                     </span>
                     <div className="font-bold">
-                      {value.toLocaleString()} ETH
+                      {value.toLocaleString()} USDC
                     </div>
                   </div>
 
@@ -286,7 +323,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                         {(
                           parseInt(latestLoan.requestedAmount) / 1e18
                         ).toLocaleString()}{" "}
-                        ETH
+                        USDC
                       </span>
                     </div>
 
@@ -325,7 +362,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                               {(
                                 parseInt(latestLoan.valuation) / 1e18
                               ).toLocaleString()}{" "}
-                              ETH
+                              USDC
                             </span>
                           </div>
                           <div className="flex gap-2">
@@ -360,7 +397,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                         {(
                           parseInt(latestLoan.amount || "0") / 1e18
                         ).toLocaleString()}{" "}
-                        ETH
+                        USDC
                       </span>
                     </div>
 
@@ -401,7 +438,13 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                         </h3>
                         <p className="text-sm text-green-700 mb-3">
                           {`You've accepted the lender's offer. The loan will
-                          be processed shortly.`}
+                          be processed shortly. Deliver your asset to the below cold storage address.`}
+                        </p>
+                        <p>
+                          <span className="font-bold">
+                            Cold Storage Address:
+                          </span>
+                          xyz street
                         </p>
                         <div className="flex justify-between items-center">
                           <span className="text-green-800">Amount:</span>
@@ -411,7 +454,7 @@ export default function RWADetails({ params }: { params: { id: string } }) {
                                   parseInt(latestLoan.valuation) / 1e18
                                 ).toLocaleString()
                               : "0"}{" "}
-                            ETH
+                            USDC
                           </span>
                         </div>
                       </div>

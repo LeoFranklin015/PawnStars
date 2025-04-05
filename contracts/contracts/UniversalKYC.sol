@@ -11,7 +11,7 @@ contract UniversalKYC {
     mapping(address => string) public userName;
 
     // Event to log when a user is verified
-    event UserVerified(address indexed user, bytes32 proof, string name, bool isVerified);
+    event UserVerified(address indexed user, bytes32 proof, string name);
 
     // Function to verify a user's KYC and store the proof
     function verifyUser(address _user, bytes32 _proof, string memory _name) public {
@@ -22,7 +22,7 @@ contract UniversalKYC {
         userProof[_user] = _proof;
 
         // Emit an event to log the verification action
-        emit UserVerified(_user, _proof, _name, true);
+        emit UserVerified(_user, _proof, _name);
     }
     
     // Function to check if a user is verified

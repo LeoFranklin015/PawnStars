@@ -5,33 +5,8 @@ import {
   LoanIssued as LoanIssuedEvent,
   LoanRepaid as LoanRepaidEvent,
 } from "../generated/LendingProtocol/LendingProtocol";
-import { User, RWA, Loan, LoanEvent } from "../generated/schema";
-import { BigInt, ethereum, Bytes } from "@graphprotocol/graph-ts";
-
-function createLoanEvent(
-  loan: Loan,
-  eventType: string,
-  event: ethereum.Event,
-  valuation: BigInt | null = null,
-  repaymentAmount: BigInt | null = null
-): void {
-  let eventId = Bytes.fromHexString(
-    event.transaction.hash.concatI32(event.logIndex.toI32()).toHexString()
-  );
-  let loanEvent = new LoanEvent(eventId);
-  loanEvent.loan = loan.id;
-  loanEvent.eventType = eventType;
-  if (valuation) {
-    loanEvent.valuation = valuation;
-  }
-  if (repaymentAmount) {
-    loanEvent.repaymentAmount = repaymentAmount;
-  }
-  loanEvent.blockNumber = event.block.number;
-  loanEvent.blockTimestamp = event.block.timestamp;
-  loanEvent.transactionHash = event.transaction.hash;
-  loanEvent.save();
-}
+import { User, RWA, Loan } from "../generated/schema";
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 export function handleLoanRequested(event: LoanRequestedEvent): void {
   // Load or create User
@@ -40,6 +15,8 @@ export function handleLoanRequested(event: LoanRequestedEvent): void {
   if (!user) {
     user = new User(userId);
     user.isVerified = false;
+    user.name = "";
+    user.proof = Bytes.fromHexString("0x");
     user.createdAt = event.block.timestamp;
     user.lastUpdated = event.block.timestamp;
     user.save();
@@ -57,8 +34,6 @@ export function handleLoanRequested(event: LoanRequestedEvent): void {
   loan.createdAt = event.block.timestamp;
   loan.lastUpdated = event.block.timestamp;
   loan.save();
-
-  createLoanEvent(loan, "REQUESTED", event);
 }
 
 export function handleValuationProvided(event: ValuationProvidedEvent): void {
@@ -70,8 +45,6 @@ export function handleValuationProvided(event: ValuationProvidedEvent): void {
   loan.status = "VALUED";
   loan.lastUpdated = event.block.timestamp;
   loan.save();
-
-  createLoanEvent(loan, "VALUATION_PROVIDED", event, event.params.valuation);
 }
 
 export function handleLoanAccepted(event: LoanAcceptedEvent): void {
@@ -90,8 +63,6 @@ export function handleLoanAccepted(event: LoanAcceptedEvent): void {
     rwa.lastUpdated = event.block.timestamp;
     rwa.save();
   }
-
-  createLoanEvent(loan, "ACCEPTED", event);
 }
 
 export function handleLoanIssued(event: LoanIssuedEvent): void {
@@ -106,8 +77,6 @@ export function handleLoanIssued(event: LoanIssuedEvent): void {
   loan.status = "ACTIVE";
   loan.lastUpdated = event.block.timestamp;
   loan.save();
-
-  createLoanEvent(loan, "ISSUED", event);
 }
 
 export function handleLoanRepaid(event: LoanRepaidEvent): void {
@@ -128,6 +97,4 @@ export function handleLoanRepaid(event: LoanRepaidEvent): void {
     rwa.lastUpdated = event.block.timestamp;
     rwa.save();
   }
-
-  createLoanEvent(loan, "REPAID", event, null, loan.repaymentAmount);
 }

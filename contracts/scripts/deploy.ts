@@ -15,7 +15,7 @@ async function main() {
   await universalKYC.verifyUser(
     "0x4b4b30e2E7c6463b03CdFFD6c42329D357205334",
     "0x0000000000000000000000000000000000000000000000000000000000000000",
-    "Leo Franklin"
+    "LeoFranklin"
   );
 
   const RWA = await ethers.getContractFactory("RWA");

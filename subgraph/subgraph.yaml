@@ -5,12 +5,34 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
+    name: UniversalKYC
+    network: hashkeychain-sepolia
+    source:
+      address: "0x59b8d2771ddA615F117FB24Ff942b0A978dd14de" # Replace with actual address
+      abi: UniversalKYC
+      startBlock: 010332018
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - UserVerified
+      abis:
+        - name: UniversalKYC
+          file: ./abis/UniversalKYC.json
+      eventHandlers:
+        - event: UserVerified(indexed address,bytes32,string)
+          handler: handleUserVerified
+      file: ./src/universal-kyc.ts
+
+  - kind: ethereum
     name: Issuer
     network: hashkeychain-sepolia
     source:
-      address: "0x4Bac3740e3980731f041983B61C075a2D316e78A"
+      address: "0x34F92e28f0870b6398b96C59de0480738f908E24"
       abi: Issuer
-      startBlock: 010323033
+      startBlock: 010332018
+
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -29,33 +51,12 @@ dataSources:
       file: ./src/issuer.ts
 
   - kind: ethereum
-    name: UniversalKYC
-    network: hashkeychain-sepolia
-    source:
-      address: "0x5A47902ceb0AEbF11D18df3b88209E735Deb708C" # Replace with actual address
-      abi: UniversalKYC
-      startBlock: 010323033
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - UserVerified
-      abis:
-        - name: UniversalKYC
-          file: ./abis/UniversalKYC.json
-      eventHandlers:
-        - event: USERVERIFIED(indexed address,bytes32,string)
-          handler: handleUserVerified
-      file: ./src/universal-kyc.ts
-
-  - kind: ethereum
     name: RWA
     network: hashkeychain-sepolia
     source:
-      address: "0xB1b866325B97367cBA86C2428400C1311907d7bb" # Replace with actual address
+      address: "0xB52C6990bB66f7A52c5ecbd693aE87949053d540" # Replace with actual address
       abi: RWA
-      startBlock: 010322733
+      startBlock: 10330264
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -74,9 +75,9 @@ dataSources:
     name: LendingProtocol
     network: hashkeychain-sepolia
     source:
-      address: "0x8A5fA1b0A754Ca969a748bF507b41c76aB43DC97" # Replace with actual address
+      address: "0x1c64AaE98901a61c92dd811758791CceC1661C83" # Replace with actual address
       abi: LendingProtocol
-      startBlock: 010323033
+      startBlock: 010332018
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

@@ -1,0 +1,29 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Issuer
+    network: hashkeychain-sepolia
+    source:
+      address: "0x59489c33742C86f349896958b47CC45D86671B98"
+      abi: Issuer
+      startBlock: 010323033
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - RWAApproved
+        - RWARequestCreated
+      abis:
+        - name: Issuer
+          file: ./abis/Issuer.json
+      eventHandlers:
+        - event: RWAApproved(indexed uint256,indexed address,string,string,string)
+          handler: handleRWAApproved
+        - event: RWARequestCreated(indexed uint256,indexed address,uint256,string,string,string)
+          handler: handleRWARequestCreated
+      file: ./src/issuer.ts

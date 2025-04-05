@@ -1,0 +1,8 @@
+{
+  "hashkeychain-sepolia": {
+    "Issuer": {
+      "address": "0x59489c33742C86f349896958b47CC45D86671B98",
+      "startBlock": 10323033
+    }
+  }
+}

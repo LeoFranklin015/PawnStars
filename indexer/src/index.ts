@@ -12,7 +12,7 @@ const main = async () => {
           "https://celo-alfajores.g.alchemy.com/v2/6unFRgRqxklQkmPxSBhd2WE9aMV5ffMY",
         contractAddress:
           process.env.CONTRACT_ADDRESS ||
-          "0x02DD486b283a644D1C72f83Ef5B4e4fF97f6D6BE",
+          "0x036551552e14AC7fbb0754FF1dDC5Ae64E0F1834",
         chainId: 44787, // Celo Alfajores testnet
       },
     ];

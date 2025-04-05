@@ -1,7 +1,6 @@
 import { Contract, JsonRpcProvider, WebSocketProvider } from "ethers";
 import { IssuerAbi } from "../utilities/abis/Issuer";
 import { RequestKYC } from "../utilities/EventHandlers/RequestKYCHandler";
-import { handleLoanRequested } from "../utilities/EventHandlers/LoanRequestedHandler";
 // Contract ABI
 const contractABI = IssuerAbi;
 interface ChainConfig {
@@ -46,6 +45,9 @@ export class HashKeyRWAVerifier {
     try {
       // Remove any existing listeners to prevent duplicates
       this.contract.removeAllListeners("RWARequestCreated");
+      console.log(
+        `[Chain ${this.chainId}] Setting up event listeners for contract at ${this.config.contractAddress}`
+      );
 
       // Set up the RWARequestCreated event listener
       this.contract.on(
@@ -59,6 +61,18 @@ export class HashKeyRWAVerifier {
           documentHash
         ) => {
           try {
+            console.log(
+              `[Chain ${this.chainId}] RWARequestCreated event received:`,
+              {
+                requestId: requestId.toString(),
+                requester,
+                yearsOfUsage: yearsOfUsage.toString(),
+                productName,
+                imageHash,
+                documentHash,
+              }
+            );
+
             await RequestKYC(
               requestId,
               requester,
@@ -74,6 +88,18 @@ export class HashKeyRWAVerifier {
             );
           }
         }
+      );
+
+      // Check contract provider and network
+      const network = await this.provider.getNetwork();
+      console.log(`[Chain ${this.chainId}] Connected to network:`, {
+        chainId: network.chainId,
+        name: network.name,
+      });
+
+      console.log(
+        `[Chain ${this.chainId}] Contract address:`,
+        this.config.contractAddress
       );
 
       // Set up provider error handling

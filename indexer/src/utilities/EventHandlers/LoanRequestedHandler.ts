@@ -4,6 +4,7 @@ import { createWalletClient, http } from "viem";
 import { hashkeyTestnet } from "viem/chains";
 import { createPublicClient } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import { LENDING_ABI } from "../abis/Lending";
 
 export const handleLoanRequested = async (
   borrower: string,
@@ -27,13 +28,6 @@ export const handleLoanRequested = async (
       transport: http(),
     });
 
-    const rwa = await publicClient.readContract({
-      address: "0x5Dec92c62c804c0d248a854138A7192945f47F3d",
-      abi: IssuerAbi,
-      functionName: "getRWA",
-      args: [rwaId],
-    });
-
     const walletClient = createWalletClient({
       account: privateKeyToAccount(process.env.PRIVATE_KEY as `0x${string}`),
       transport: http(),
@@ -42,10 +36,16 @@ export const handleLoanRequested = async (
 
     const tx = await walletClient.writeContract({
       address: "0x5Dec92c62c804c0d248a854138A7192945f47F3d",
-      abi: IssuerAbi,
-      functionName: "approveLoan",
-      args: [rwaId, borrower, amount],
+      abi: LENDING_ABI,
+      functionName: "provideValuation",
+      args: [rwaId - BigInt(1), BigInt(500000000000000000000)],
     });
+
+    const txReceipt = await publicClient.waitForTransactionReceipt({
+      hash: tx,
+    });
+
+    console.log("txReceipt", txReceipt);
   } catch (error) {
     console.error("Error handling LoanRequested event:", error);
     throw error;

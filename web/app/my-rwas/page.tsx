@@ -99,13 +99,6 @@ export default function MyRWAs() {
     setShowLendModal(true);
   };
 
-  const getImageUrl = (rwa: RWA) => {
-    if (rwa.imageHash && rwa.imageHash !== "") {
-      return `/placeholder.svg?height=200&width=300`;
-    }
-    return "/placeholder.svg?height=200&width=300";
-  };
-
   const getRWAStatus = (rwa: RWA) => {
     // First check the RWA status from the API
     if (rwa.status) {

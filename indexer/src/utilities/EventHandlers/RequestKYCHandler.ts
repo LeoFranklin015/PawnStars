@@ -16,7 +16,7 @@ async function analyzeKYCDocuments(
   imageBlob: Blob,
   documentBlob: Blob,
   productName: string,
-  productModel: string
+  imageHash: string
 ) {
   try {
     // Convert image blob to base64
@@ -61,7 +61,7 @@ export const RequestKYC = async (
   requester: string,
   yearsOfUsage: number,
   productName: string,
-  productModel: string,
+  imageHash: string,
   documentHash: string
 ): Promise<void> => {
   try {
@@ -69,7 +69,7 @@ export const RequestKYC = async (
     console.log("Requester:", requester);
     console.log("Years of Usage:", yearsOfUsage);
     console.log("Product Name:", productName);
-    console.log("Product Model:", productModel);
+    console.log("Image Hash:", imageHash);
     console.log("Document Hash:", documentHash);
     console.log("------------------------");
 
@@ -79,7 +79,7 @@ export const RequestKYC = async (
         pinataGateway: process.env.PINATA_GATEWAY!,
       });
 
-      const imageResponse = await pinata.gateways.private.get(productModel);
+      const imageResponse = await pinata.gateways.private.get(imageHash);
       const imageBuffer = Buffer.from(imageResponse.toString(), "binary");
       const imageBlob = new Blob([imageBuffer], { type: "image/jpeg" });
       console.log("Image blob received");
@@ -96,7 +96,7 @@ export const RequestKYC = async (
         imageBlob,
         documentBlob,
         productName,
-        productModel
+        imageHash
       );
       console.log("Combined Analysis:", analysis);
     } catch (error) {

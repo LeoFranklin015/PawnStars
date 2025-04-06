@@ -1,4 +1,9 @@
 # PawnStars
+
+
+PawnStars is an innovative platform that enables users to secure loans using Real World Assets (RWA) as collateral. The loan pricing is dynamically set by an AI agent that analyzes the current market conditions, ensuring fair and accurate valuations. Additionally, PawnStars integrates Universal KYC compliance, gating access to only KYC-verified users, ensuring regulatory adherence and a secure, trusted environment for decentralized lending
+
+
 <img width="913" alt="Screenshot 2025-04-06 at 8 46 47 AM" src="https://github.com/user-attachments/assets/fa5f8dcf-5036-4891-80e4-7b4c70b781e5" />
 
 ## **KYC Verification (Privacy-Preserving)**
@@ -57,6 +62,8 @@ PawnStars revolutionizes lending in the DeFi space by integrating AI-driven mark
 ### Celo
 - https://github.com/LeoFranklin015/PawnStars/blob/2c353e7174b387630db26883b5c6b686c0c6fd7b/web/app/api/verify/route.ts#L226
 - https://github.com/LeoFranklin015/PawnStars/blob/master/contracts/contracts/KYCVerifier.sol
+- KYC_VERIFIER_CONTRACT_ADDRESS =
+  "0x036551552e14AC7fbb0754FF1dDC5Ae64E0F1834";
 
 
 ### Self

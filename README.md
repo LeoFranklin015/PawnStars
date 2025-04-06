@@ -76,6 +76,13 @@ PawnStars revolutionizes lending in the DeFi space by integrating AI-driven mark
 
 - https://github.com/LeoFranklin015/PawnStars/tree/master/contracts/contracts
 - https://github.com/LeoFranklin015/PawnStars/blob/master/web/lib/const.ts
+- Video Link : https://www.canva.com/design/DAGj0M_bx9s/JyD6sri_BoOljrNsPk5_NA/edit?utm_content=DAGj0M_bx9s&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+- [UNIVERSAL_KYC_CONTRACT_ADDRESS](https://hashkeychain-testnet-explorer.alt.technology/address/0x7f6345C845199C2B26f03Cc4207c25d7c5638DAC)
+- [ISSUER_CONTRACT_ADDRESS](https://hashkeychain-testnet-explorer.alt.technology/address/0xefF7Bf6B003AfAaFB45C9D922db2162ca4D4A866)
+- [RWA_CONTRACT_ADDRESS](https://hashkeychain-testnet-explorer.alt.technology/address/0xfB7444EA4937932e9BCB085cE94244c2486358F0)
+- [MOCK_USDC_CONTRACT_ADDRESS](https://hashkeychain-testnet-explorer.alt.technology/address/0xb0C751730dd4B0bF5345426e4441555472562756)
+- [LENDING_PROTOCOL_CONTRACT_ADDRESS](https://hashkeychain-testnet-explorer.alt.technology/address/0x5Dec92c62c804c0d248a854138A7192945f47F3d)
+
 
 
 ### Deployments

@@ -1,4 +1,5 @@
-# PawnStars Project Overview
+# PawnStars
+<img width="913" alt="Screenshot 2025-04-06 at 8 46 47 AM" src="https://github.com/user-attachments/assets/fa5f8dcf-5036-4891-80e4-7b4c70b781e5" />
 
 ## **KYC Verification (Privacy-Preserving)**
    - Users verify their identity using a **self-protocol**, ensuring privacy without revealing personal information.
@@ -68,4 +69,32 @@ PawnStars revolutionizes lending in the DeFi space by integrating AI-driven mark
 
 - https://github.com/LeoFranklin015/PawnStars/tree/master/contracts/contracts
 - https://github.com/LeoFranklin015/PawnStars/blob/master/web/lib/const.ts
+
+
+### Deployments
+```ts
+export const GRAPH_URL =
+  "https://api.studio.thegraph.com/query/73364/pawnstars/version/latest";
+
+export const KYC_VERIFIER_CONTRACT_ADDRESS =
+  "0x036551552e14AC7fbb0754FF1dDC5Ae64E0F1834";
+
+export const UNIVERSAL_KYC_CONTRACT_ADDRESS =
+  "0x7f6345C845199C2B26f03Cc4207c25d7c5638DAC";
+
+export const ISSUER_CONTRACT_ADDRESS =
+  "0xefF7Bf6B003AfAaFB45C9D922db2162ca4D4A866";
+
+export const RWA_CONTRACT_ADDRESS =
+  "0xfB7444EA4937932e9BCB085cE94244c2486358F0";
+
+export const MOCK_USDC_CONTRACT_ADDRESS =
+  "0xb0C751730dd4B0bF5345426e4441555472562756";
+
+export const LENDING_PROTOCOL_CONTRACT_ADDRESS =
+  "0x5Dec92c62c804c0d248a854138A7192945f47F3d";
+
+```
+
+
 
